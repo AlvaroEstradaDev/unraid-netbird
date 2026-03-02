@@ -4,7 +4,7 @@
 <PLUGIN 
   name="netbird"
   author="Alvaro Estrada"
-  version="2026.03.02.2249"
+  version="2026.03.02.2300"
   launch="Settings/Netbird"
   pluginURL="https://raw.githubusercontent.com/AlvaroEstradaDev/unraid-netbird/main/plugin/netbird.plg"
   support="https://forums.unraid.net/topic/"
@@ -15,6 +15,28 @@
 
 <CHANGES>
 <![CDATA[
+
+### 2026.03.02.2300
+
+## Bug Fixes
+
+### Settings Page Auto-Refresh Issue
+- **Fixed** auto-refresh timer not being properly cleared on Settings page
+ - Now clears `timers.refresh` in document-ready handler with safety checks
+ - Prevents form data loss when navigating to Settings from other pages
+
+### Duplicate Release Workflow Runs
+- **Fixed** duplicate release workflow executions
+ - Removed `published` event trigger from release.yml (redundant with `released`)
+ - Workflow now only triggers on `released` and `prereleased` events
+
+## Technical Details
+
+### Files Modified
+- `Settings.php`: Improved timer clearing logic with proper initialization checks
+- `release.yml`: Removed duplicate `published` trigger to prevent double workflow runs
+
+**Full Changelog**: https://github.com/AlvaroEstradaDev/unraid-netbird/compare/2026.03.02.2249...2026.03.02.2300
 
 ### 2026.03.02.2249
 
@@ -53,10 +75,6 @@
 ### 🚀 Features
 
 - feat: add setup key authentication via web UI ([#6](https://github.com/AlvaroEstradaDev/unraid-netbird/pull/6))
-
-### 2026.03.02.2139
-
-- fix: ensure explicit tag refs for git push ([#5](https://github.com/AlvaroEstradaDev/unraid-netbird/pull/5))
 
 
 For older releases, see https://github.com/AlvaroEstradaDev/unraid-netbird/releases
@@ -100,9 +118,9 @@ if ($oldPlugin !== "") {
 <SHA256>10196c855c4ebd849e54325dde3b8727bc91c070b75a7abf9325326c0a7c72f6</SHA256>
 </FILE>
 
-<FILE Name="/boot/config/plugins/netbird/unraid-netbird-utils-2026.03.02.2249-noarch-1.txz">
-<URL>https://github.com/AlvaroEstradaDev/unraid-netbird/releases/download/2026.03.02.2249/unraid-netbird-utils-2026.03.02.2249-noarch-1.txz</URL>
-<SHA256>acb147882212e95346d617c16fe78ed259425e20390637dd75f93108a8a30e0a</SHA256>
+<FILE Name="/boot/config/plugins/netbird/unraid-netbird-utils-2026.03.02.2300-noarch-1.txz">
+<URL>https://github.com/AlvaroEstradaDev/unraid-netbird/releases/download/2026.03.02.2300/unraid-netbird-utils-2026.03.02.2300-noarch-1.txz</URL>
+<SHA256>d3502e8eca1d7dfce93cc9283d3c3ea23cbbabff461d450258e826b9966c3299</SHA256>
 </FILE>
 
 <!--
@@ -120,7 +138,7 @@ if [ -L "/etc/rc.d/rc.netbird" ]; then
     rm -f /etc/rc.d/rc.netbird
 fi
 
-upgradepkg --install-new /boot/config/plugins/netbird/unraid-netbird-utils-2026.03.02.2249-noarch-1.txz
+upgradepkg --install-new /boot/config/plugins/netbird/unraid-netbird-utils-2026.03.02.2300-noarch-1.txz
 
 mkdir -p /usr/local/emhttp/plugins/netbird/bin
 tar xzf /boot/config/plugins/netbird/0.66.0.tar.gz -C /usr/local/emhttp/plugins/netbird/bin netbird
@@ -145,7 +163,7 @@ rm -f /var/log/plugins/netbird-trunk.plg
 netbird completion bash > /etc/bash_completion.d/netbird
 
 # cleanup old versions
-rm -f $(ls /boot/config/plugins/netbird/unraid-netbird-utils-*.txz 2>/dev/null | grep -v '2026.03.02.2249')
+rm -f $(ls /boot/config/plugins/netbird/unraid-netbird-utils-*.txz 2>/dev/null | grep -v '2026.03.02.2300')
 rm -f $(ls /boot/config/plugins/netbird/*.tar.gz 2>/dev/null | grep -v '0.66.0')
 
 # check to see if the state file has been backed up to Unraid Connect
@@ -169,7 +187,7 @@ fi
 echo ""
 echo "----------------------------------------------------"
 echo " netbird has been installed."
-echo " Version: 2026.03.02.2249"
+echo " Version: 2026.03.02.2300"
 echo "----------------------------------------------------"
 echo ""
 ]]>
