@@ -17,7 +17,7 @@ jobs:
         id: release_action
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          plg_branch: trunk
+          plg_branch: main
           build_prereleases: true
           ssh_key: ${{ secrets.DEPLOY_KEY }}
           composer_dir: src/usr/local/php/unraid-netbird-utils/
