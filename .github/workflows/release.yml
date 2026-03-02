@@ -32,7 +32,7 @@ jobs:
         run: |
           cd ${{ github.workspace }}/main
           git tag -f preview ${{ steps.release_action.outputs.commit_long_sha }}
-          git push origin preview --force
+          git push origin refs/tags/preview --force
 
       # Update main tag if not a prerelease
       - name: Update main tag
@@ -40,4 +40,4 @@ jobs:
         run: |
           cd ${{ github.workspace }}/main
           git tag -f main ${{ steps.release_action.outputs.commit_long_sha }}
-          git push origin main --force
+          git push origin refs/tags/main --force
