@@ -76,9 +76,9 @@ if ($oldPlugin !== "") {
 </INLINE>
 </FILE>
 
-<FILE Name="/boot/config/plugins/netbird/netbird_1.94.2_amd64.tgz">
-<URL>https://pkgs.netbird.com/stable/netbird_1.94.2_amd64.tgz</URL>
-<SHA256>c6f99a5d774c7783b56902188d69e9756fc3dddfb08ac6be4cb2585f3fecdc32</SHA256>
+<FILE Name="/boot/config/plugins/netbird/0.66.0.tar.gz">
+<URL>https://github.com/netbirdio/netbird/releases/download/v0.66.0/netbird_0.66.0_linux_amd64.tar.gz</URL>
+<SHA256>10196c855c4ebd849e54325dde3b8727bc91c070b75a7abf9325326c0a7c72f6</SHA256>
 </FILE>
 
 <FILE Name="/boot/config/plugins/netbird/unraid-netbird-utils-2026.02.16.0429-noarch-1.txz">
@@ -104,7 +104,7 @@ fi
 upgradepkg --install-new /boot/config/plugins/netbird/unraid-netbird-utils-2026.02.16.0429-noarch-1.txz
 
 mkdir -p /usr/local/emhttp/plugins/netbird/bin
-tar xzf /boot/config/plugins/netbird/netbird_1.94.2_amd64.tgz --strip-components 1 -C /usr/local/emhttp/plugins/netbird/bin
+tar xzf /boot/config/plugins/netbird/0.66.0.tar.gz -C /usr/local/emhttp/plugins/netbird/bin netbird
 
 echo "state" > /boot/config/plugins/netbird/.gitignore
 
@@ -130,7 +130,7 @@ netbird completion bash > /etc/bash_completion.d/netbird
 
 # cleanup old versions
 rm -f $(ls /boot/config/plugins/netbird/unraid-netbird-utils-*.txz 2>/dev/null | grep -v '2026.02.16.0429')
-rm -f $(ls /boot/config/plugins/netbird/*.tgz 2>/dev/null | grep -v 'netbird_1.94.2_amd64')
+rm -f $(ls /boot/config/plugins/netbird/*.tar.gz 2>/dev/null | grep -v '0.66.0')
 
 # check to see if the state file has been backed up to Unraid Connect
 if [ -d "/boot/.git" ]; then
@@ -175,7 +175,7 @@ rm /usr/local/sbin/netbird
 removepkg unraid-netbird-utils
 
 rm -rf /usr/local/emhttp/plugins/netbird
-rm -f /boot/config/plugins/netbird/*.tgz
+rm -f /boot/config/plugins/netbird/*.tar.gz
 rm -f /boot/config/plugins/netbird/*.txz
 ]]>
 </INLINE>
