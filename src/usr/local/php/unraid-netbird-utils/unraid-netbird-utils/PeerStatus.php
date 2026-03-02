@@ -21,24 +21,24 @@ namespace Netbird;
 
 class PeerStatus
 {
-    public string $Name = "";
+    public string $Name      = "";
     public string $LoginName = "";
-    public bool $SharedUser = false;
+    public bool $SharedUser  = false;
 
     /** @var string[] */
     public array $IP = array();
 
     public string $Address = "";
 
-    public bool $Online = false;
-    public bool $Active = false;
+    public bool $Online  = false;
+    public bool $Active  = false;
     public bool $Relayed = false;
 
     public bool $Traffic = false;
-    public int $TxBytes = 0;
-    public int $RxBytes = 0;
+    public int $TxBytes  = 0;
+    public int $RxBytes  = 0;
 
-    public bool $ExitNodeActive = false;
+    public bool $ExitNodeActive    = false;
     public bool $ExitNodeAvailable = false;
-    public bool $Mullvad = false;
+    public bool $Mullvad           = false;
 }

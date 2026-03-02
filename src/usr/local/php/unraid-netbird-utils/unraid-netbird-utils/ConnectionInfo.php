@@ -21,10 +21,10 @@ namespace Netbird;
 
 class ConnectionInfo
 {
-    public string $HostName = "";
-    public string $DNSName = "";
-    public string $NetbirdIPs = "";
+    public string $HostName     = "";
+    public string $DNSName      = "";
+    public string $NetbirdIPs   = "";
     public string $AcceptRoutes = "";
-    public string $AcceptDNS = "";
-    public string $RunSSH = "";
+    public string $AcceptDNS    = "";
+    public string $RunSSH       = "";
 }

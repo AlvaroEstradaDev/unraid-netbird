@@ -25,6 +25,6 @@ class DashboardInfo
     public array $NetbirdIPs = array();
 
     public string $HostName = "";
-    public string $DNSName = "";
-    public string $Online = "";
+    public string $DNSName  = "";
+    public string $Online   = "";
 }

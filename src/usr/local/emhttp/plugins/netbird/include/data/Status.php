@@ -24,45 +24,45 @@ use EDACerton\PluginUtils\Translator;
 try {
     require_once dirname(dirname(__FILE__)) . "/common.php";
 
-    if (!defined(__NAMESPACE__ . '\PLUGIN_ROOT') || !defined(__NAMESPACE__ . '\PLUGIN_NAME')) {
+    if ( ! defined(__NAMESPACE__ . '\PLUGIN_ROOT') || ! defined(__NAMESPACE__ . '\PLUGIN_NAME')) {
         throw new \RuntimeException("Common file not loaded.");
     }
 
-    $tr = $tr ?? new Translator(PLUGIN_ROOT);
+    $tr    = $tr    ?? new Translator(PLUGIN_ROOT);
     $utils = $utils ?? new Utils(PLUGIN_NAME);
 
     $netbirdConfig = $netbirdConfig ?? new Config();
 
-    if (!$netbirdConfig->Enable) {
-        echo ("{}");
+    if ( ! $netbirdConfig->Enable) {
+        echo("{}");
         return;
     }
 
     switch ($_POST['action']) {
         case 'get':
             $netbirdInfo = $netbirdInfo ?? new Info($tr);
-            $rows = "";
+            $rows        = "";
 
             $mullvad = filter_var($_POST['mullvad'] ?? false, FILTER_VALIDATE_BOOLEAN);
-            $shared = filter_var($_POST['shared'] ?? false, FILTER_VALIDATE_BOOLEAN);
+            $shared  = filter_var($_POST['shared'] ?? false, FILTER_VALIDATE_BOOLEAN);
 
             foreach ($netbirdInfo->getPeerStatus() as $peer) {
-                if ($peer->Mullvad && !$mullvad && !$peer->Active) {
+                if ($peer->Mullvad && ! $mullvad && ! $peer->Active) {
                     continue;
                 }
-                if ($peer->SharedUser && !$shared && !$peer->Active) {
+                if ($peer->SharedUser && ! $shared && ! $peer->Active) {
                     continue;
                 }
 
-                $user = $peer->SharedUser ? $tr->tr('status_page.shared') : $peer->Name;
-                $online = $peer->Online ? ($peer->Active ? $tr->tr('status_page.active') : $tr->tr('status_page.idle')) : $tr->tr('status_page.offline');
-                $exitNode = $peer->ExitNodeActive ? $tr->tr('status_page.exit_active') : ($peer->ExitNodeAvailable ? ($peer->Mullvad ? "Mullvad" : $tr->tr('status_page.exit_available')) : "");
+                $user       = $peer->SharedUser ? $tr->tr('status_page.shared') : $peer->Name;
+                $online     = $peer->Online ? ($peer->Active ? $tr->tr('status_page.active') : $tr->tr('status_page.idle')) : $tr->tr('status_page.offline');
+                $exitNode   = $peer->ExitNodeActive ? $tr->tr('status_page.exit_active') : ($peer->ExitNodeAvailable ? ($peer->Mullvad ? "Mullvad" : $tr->tr('status_page.exit_available')) : "");
                 $connection = $peer->Active ? ($peer->Relayed ? $tr->tr('status_page.relay') : $tr->tr('status_page.direct')) : "";
-                $active = $peer->Active ? $peer->Address : "";
-                $txBytes = $peer->Traffic ? $peer->TxBytes : "";
-                $rxBytes = $peer->Traffic ? $peer->RxBytes : "";
-                $pingHost = ($peer->SharedUser || $peer->Active || !$peer->Online || $peer->Mullvad) ? "" : "<input type='button' class='ping' value='Ping' onclick='pingHost(\"{$peer->Name}\")'>";
-                $ips = implode("<br>", $peer->IP);
+                $active     = $peer->Active ? $peer->Address : "";
+                $txBytes    = $peer->Traffic ? $peer->TxBytes : "";
+                $rxBytes    = $peer->Traffic ? $peer->RxBytes : "";
+                $pingHost   = ($peer->SharedUser || $peer->Active || ! $peer->Online || $peer->Mullvad) ? "" : "<input type='button' class='ping' value='Ping' onclick='pingHost(\"{$peer->Name}\")'>";
+                $ips        = implode("<br>", $peer->IP);
 
                 $rows .= <<<EOT
                     <tr>
@@ -102,18 +102,18 @@ try {
                 </table>
                 EOT;
 
-            $rtn = array();
+            $rtn         = array();
             $rtn['html'] = $output;
             echo json_encode($rtn);
             break;
         case 'ping':
             $netbirdInfo = $netbirdInfo ?? new Info($tr);
-            $out = "Could not find host.";
+            $out         = "Could not find host.";
 
             foreach ($netbirdInfo->getPeerStatus() as $peer) {
                 if ($peer->Name == $_POST['host']) {
                     $peerIP = escapeshellarg($peer->IP[0]);
-                    $out = implode("<br>", $utils->run_command("netbird ping {$peerIP}"));
+                    $out    = implode("<br>", $utils->run_command("netbird ping {$peerIP}"));
                     break;
                 }
             }

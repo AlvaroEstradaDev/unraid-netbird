@@ -40,11 +40,11 @@ class Info
 
         $this->localAPI = new LocalAPI();
 
-        $this->tr = $tr;
+        $this->tr         = $tr;
         $this->smbEnabled = $share_config['shareSMBEnabled'] ?? "";
-        $this->useNetbios = $ident_config['USE_NETBIOS'] ?? "";
-        $this->status = $this->localAPI->getStatus();
-        $this->routes = $this->localAPI->getRoutes();
+        $this->useNetbios = $ident_config['USE_NETBIOS']     ?? "";
+        $this->status     = $this->localAPI->getStatus();
+        $this->routes     = $this->localAPI->getRoutes();
 
         $plugin_config_file = '/boot/config/plugins/netbird/netbird.cfg';
         $this->pluginConfig = file_exists($plugin_config_file)
@@ -72,13 +72,13 @@ class Info
 
         $statusInfo = new StatusInfo();
 
-        $statusInfo->TsVersion = isset($status->Version) ? $status->Version : $this->tr("unknown");
+        $statusInfo->TsVersion     = isset($status->Version) ? $status->Version : $this->tr("unknown");
         $statusInfo->KeyExpiration = isset($status->Self->KeyExpiry) ? $status->Self->KeyExpiry : $this->tr("disabled");
-        $statusInfo->Online = isset($status->Self->Online) ? ($status->Self->Online ? $this->tr("yes") : $this->tr("no")) : $this->tr("unknown");
-        $statusInfo->InNetMap = isset($status->Self->InNetworkMap) ? ($status->Self->InNetworkMap ? $this->tr("yes") : $this->tr("no")) : $this->tr("unknown");
-        $statusInfo->Tags = isset($status->Self->Tags) ? implode("<br>", $status->Self->Tags) : "";
-        $statusInfo->LoggedIn = $this->isOnline() ? $this->tr("yes") : $this->tr("no");
-        $statusInfo->TsHealth = isset($status->Health) ? implode("<br>", $status->Health) : "";
+        $statusInfo->Online        = isset($status->Self->Online) ? ($status->Self->Online ? $this->tr("yes") : $this->tr("no")) : $this->tr("unknown");
+        $statusInfo->InNetMap      = isset($status->Self->InNetworkMap) ? ($status->Self->InNetworkMap ? $this->tr("yes") : $this->tr("no")) : $this->tr("unknown");
+        $statusInfo->Tags          = isset($status->Self->Tags) ? implode("<br>", $status->Self->Tags) : "";
+        $statusInfo->LoggedIn      = $this->isOnline() ? $this->tr("yes") : $this->tr("no");
+        $statusInfo->TsHealth      = isset($status->Health) ? implode("<br>", $status->Health) : "";
 
         return $statusInfo;
     }
@@ -89,12 +89,12 @@ class Info
 
         $info = new ConnectionInfo();
 
-        $info->HostName = isset($status->Self->HostName) ? $status->Self->HostName : $this->tr("unknown");
-        $info->DNSName = isset($status->Self->DNSName) ? $status->Self->DNSName : $this->tr("unknown");
-        $info->NetbirdIPs = isset($status->NetbirdIPs) ? implode("<br>", $status->NetbirdIPs) : $this->tr("unknown");
+        $info->HostName     = isset($status->Self->HostName) ? $status->Self->HostName : $this->tr("unknown");
+        $info->DNSName      = isset($status->Self->DNSName) ? $status->Self->DNSName : $this->tr("unknown");
+        $info->NetbirdIPs   = isset($status->NetbirdIPs) ? implode("<br>", $status->NetbirdIPs) : $this->tr("unknown");
         $info->AcceptRoutes = $this->acceptsRoutes() ? $this->tr("yes") : $this->tr("no");
-        $info->AcceptDNS = $this->acceptsDNS() ? $this->tr("yes") : $this->tr("no");
-        $info->RunSSH = $this->runsSSH() ? $this->tr("yes") : $this->tr("no");
+        $info->AcceptDNS    = $this->acceptsDNS() ? $this->tr("yes") : $this->tr("no");
+        $info->RunSSH       = $this->runsSSH() ? $this->tr("yes") : $this->tr("no");
 
         return $info;
     }
@@ -105,10 +105,10 @@ class Info
 
         $info = new DashboardInfo();
 
-        $info->HostName = isset($status->Self->HostName) ? $status->Self->HostName : $this->tr("Unknown");
-        $info->DNSName = isset($status->Self->DNSName) ? $status->Self->DNSName : $this->tr("Unknown");
+        $info->HostName   = isset($status->Self->HostName) ? $status->Self->HostName : $this->tr("Unknown");
+        $info->DNSName    = isset($status->Self->DNSName) ? $status->Self->DNSName : $this->tr("Unknown");
         $info->NetbirdIPs = isset($status->NetbirdIPs) ? $status->NetbirdIPs : array();
-        $info->Online = isset($status->Self->Online) ? ($status->Self->Online ? $this->tr("yes") : $this->tr("no")) : $this->tr("unknown");
+        $info->Online     = isset($status->Self->Online) ? ($status->Self->Online ? $this->tr("yes") : $this->tr("no")) : $this->tr("unknown");
 
         return $info;
     }
@@ -121,8 +121,8 @@ class Info
             $expiryTime = new \DateTime($status->Self->KeyExpiry);
             $expiryTime->setTimezone(new \DateTimeZone(date_default_timezone_get()));
 
-            $interval = $expiryTime->diff(new \DateTime('now'));
-            $expiryPrint = $expiryTime->format(\DateTimeInterface::RFC7231);
+            $interval      = $expiryTime->diff(new \DateTime('now'));
+            $expiryPrint   = $expiryTime->format(\DateTimeInterface::RFC7231);
             $intervalPrint = $interval->format('%a');
 
             $warning = new Warning(sprintf($this->tr("warnings.key_expiration"), $intervalPrint, $expiryPrint));
@@ -163,7 +163,7 @@ class Info
             $peer = new PeerStatus();
 
             $peer->Name = trim($status->DNSName, ".");
-            $peer->IP = $status->NetbirdIPs;
+            $peer->IP   = $status->NetbirdIPs;
 
             $peer->LoginName = (isset($this->status->User) && isset($status->UserID))
                 ? ($this->status->User->{$status->UserID}->LoginName ?? "")
@@ -183,10 +183,10 @@ class Info
                 $peer->RxBytes = $status->RxBytes;
             }
 
-            if (!$status->Online) {
+            if ( ! $status->Online) {
                 $peer->Online = false;
                 $peer->Active = false;
-            } elseif (!$status->Active) {
+            } elseif ( ! $status->Active) {
                 $peer->Online = true;
                 $peer->Active = false;
             } else {
@@ -241,7 +241,7 @@ class Info
 
     public function needsLogin(): bool
     {
-        return !$this->isOnline();
+        return ! $this->isOnline();
     }
 
     /**

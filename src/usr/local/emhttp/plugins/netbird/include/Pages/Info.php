@@ -21,17 +21,17 @@ namespace Netbird;
 
 use EDACerton\PluginUtils\Translator;
 
-if (!defined(__NAMESPACE__ . '\PLUGIN_ROOT') || !defined(__NAMESPACE__ . '\PLUGIN_NAME')) {
+if ( ! defined(__NAMESPACE__ . '\PLUGIN_ROOT') || ! defined(__NAMESPACE__ . '\PLUGIN_NAME')) {
     throw new \RuntimeException("Common file not loaded.");
 }
 
 $tr = $tr ?? new Translator(PLUGIN_ROOT);
 
-if (!Utils::pageChecks($tr)) {
+if ( ! Utils::pageChecks($tr)) {
     return;
 }
 
-$netbirdInfo = $netbirdInfo ?? new Info($tr);
+$netbirdInfo       = $netbirdInfo ?? new Info($tr);
 $netbirdStatusInfo = $netbirdInfo->getStatusInfo();
 ?>
 <table class="unraid t1">
@@ -44,13 +44,13 @@ $netbirdStatusInfo = $netbirdInfo->getStatusInfo();
     <tbody>
         <?php
         echo Utils::printRow($tr->tr("info.version"), $netbirdStatusInfo->TsVersion);
-        echo Utils::printRow($tr->tr("info.health"), $netbirdStatusInfo->TsHealth);
-        echo Utils::printRow($tr->tr("info.login"), $netbirdStatusInfo->LoggedIn);
-        echo Utils::printRow($tr->tr("info.netmap"), $netbirdStatusInfo->InNetMap);
-        echo Utils::printRow($tr->tr("info.online"), $netbirdStatusInfo->Online);
-        echo Utils::printRow($tr->tr("info.key_expire"), $netbirdStatusInfo->KeyExpiration);
-        echo Utils::printRow($tr->tr("info.tags"), $netbirdStatusInfo->Tags);
-        echo Utils::printRow($tr->tr("info.connected_via"), $netbirdInfo->connectedViaTS() ? $tr->tr("yes") : $tr->tr("no"));
-        ?>
+echo Utils::printRow($tr->tr("info.health"), $netbirdStatusInfo->TsHealth);
+echo Utils::printRow($tr->tr("info.login"), $netbirdStatusInfo->LoggedIn);
+echo Utils::printRow($tr->tr("info.netmap"), $netbirdStatusInfo->InNetMap);
+echo Utils::printRow($tr->tr("info.online"), $netbirdStatusInfo->Online);
+echo Utils::printRow($tr->tr("info.key_expire"), $netbirdStatusInfo->KeyExpiration);
+echo Utils::printRow($tr->tr("info.tags"), $netbirdStatusInfo->Tags);
+echo Utils::printRow($tr->tr("info.connected_via"), $netbirdInfo->connectedViaTS() ? $tr->tr("yes") : $tr->tr("no"));
+?>
     </tbody>
 </table>

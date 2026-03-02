@@ -21,7 +21,7 @@ namespace Netbird;
 
 use EDACerton\PluginUtils\Translator;
 
-if (!defined(__NAMESPACE__ . '\PLUGIN_ROOT') || !defined(__NAMESPACE__ . '\PLUGIN_NAME')) {
+if ( ! defined(__NAMESPACE__ . '\PLUGIN_ROOT') || ! defined(__NAMESPACE__ . '\PLUGIN_NAME')) {
     throw new \RuntimeException("Common file not loaded.");
 }
 
@@ -33,10 +33,10 @@ $netbird_dashboard = "<tr><td>" . $tr->tr("netbird_disabled") . "</td></tr>";
 
 if ($netbirdConfig->Enable) {
     $localAPI = $localAPI ?? new LocalAPI();
-    if (!$localAPI->isReady()) {
+    if ( ! $localAPI->isReady()) {
         $netbird_dashboard = "<tr><td>" . $tr->tr("warnings.not_ready") . "</td></tr>";
     } else {
-        $netbirdInfo = $netbirdInfo ?? new Info($tr);
+        $netbirdInfo     = $netbirdInfo ?? new Info($tr);
         $netbirdDashInfo = $netbirdInfo->getDashboardInfo();
 
         $netbird_dashboard = Utils::printDash($tr->tr("info.online"), $netbirdDashInfo->Online);
@@ -70,7 +70,7 @@ echo <<<EOT
     EOT;
 
 $isResponsiveWebgui = version_compare(parse_ini_file('/etc/unraid-version')['version'] ?? "", '7.2', '>=');
-if (!$isResponsiveWebgui) {
+if ( ! $isResponsiveWebgui) {
     echo <<<EOT
         <script>
             $(function() {

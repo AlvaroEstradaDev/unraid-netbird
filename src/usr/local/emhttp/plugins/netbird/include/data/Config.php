@@ -24,17 +24,17 @@ use EDACerton\PluginUtils\Translator;
 try {
     require_once dirname(dirname(__FILE__)) . "/common.php";
 
-    if (!defined(__NAMESPACE__ . '\PLUGIN_ROOT') || !defined(__NAMESPACE__ . '\PLUGIN_NAME')) {
+    if ( ! defined(__NAMESPACE__ . '\PLUGIN_ROOT') || ! defined(__NAMESPACE__ . '\PLUGIN_NAME')) {
         throw new \RuntimeException("Common file not loaded.");
     }
 
-    $tr = $tr ?? new Translator(PLUGIN_ROOT);
+    $tr    = $tr    ?? new Translator(PLUGIN_ROOT);
     $utils = $utils ?? new Utils(PLUGIN_NAME);
 
     $netbirdConfig = $netbirdConfig ?? new Config();
 
-    if (!$netbirdConfig->Enable) {
-        echo ("{}");
+    if ( ! $netbirdConfig->Enable) {
+        echo("{}");
         return;
     }
 
@@ -43,19 +43,19 @@ try {
     switch ($_POST['action']) {
         case 'get':
             $connectionRows = "";
-            $configRows = "";
-            $routes = "<table id='routesTable' class='unraid statusTable'></table>";
-            $config = "<table id='configTable' class='unraid statusTable'></table>";
+            $configRows     = "";
+            $routes         = "<table id='routesTable' class='unraid statusTable'></table>";
+            $config         = "<table id='configTable' class='unraid statusTable'></table>";
 
             if ($netbirdInfo->needsLogin()) {
                 $connectionRows = "<tr><td>{$tr->tr("needs_login")}</td><td><input type='button' value='{$tr->tr("login")}' onclick='netbirdUp()'></td><td><a id='netbirdUpLink' href='#'></a></td></tr>";
             } else {
                 $netbirdStatusInfo = $netbirdInfo->getStatusInfo();
-                $netbirdConInfo = $netbirdInfo->getConnectionInfo();
+                $netbirdConInfo    = $netbirdInfo->getConnectionInfo();
 
-                $acceptDNSButton = "<input type='button' value='{$tr->tr("enable")}' disabled>";
+                $acceptDNSButton    = "<input type='button' value='{$tr->tr("enable")}' disabled>";
                 $acceptRoutesButton = "<input type='button' value='{$tr->tr("enable")}' disabled>";
-                $sshButton = "<input type='button' value='{$tr->tr("enable")}' disabled>";
+                $sshButton          = "<input type='button' value='{$tr->tr("enable")}' disabled>";
 
                 $connectionRows = <<<EOT
                     <tr><td>{$tr->tr("info.hostname")}</td><td>{$netbirdConInfo->HostName}</td><td></td></tr>
@@ -123,14 +123,13 @@ try {
                 </table>
                 EOT;
 
-            $rtn = array();
-            $rtn['config'] = $config;
-            $rtn['routes'] = $routes;
+            $rtn               = array();
+            $rtn['config']     = $config;
+            $rtn['routes']     = $routes;
             $rtn['connection'] = $connection;
 
             echo json_encode($rtn);
             break;
-
         case 'up':
             $utils->logmsg("Getting Auth URL");
             $authURL = $netbirdInfo->getAuthURL();
@@ -140,7 +139,7 @@ try {
                 $retries = 0;
                 while ($retries < 60) {
                     $netbirdInfo = new Info($tr);
-                    $authURL = $netbirdInfo->getAuthURL();
+                    $authURL     = $netbirdInfo->getAuthURL();
                     if ($authURL != "") {
                         break;
                     }
@@ -150,7 +149,6 @@ try {
             }
             echo $authURL;
             break;
-
     }
 } catch (\Throwable $e) {
     file_put_contents("/var/log/netbird-error.log", print_r($e, true) . PHP_EOL, FILE_APPEND);

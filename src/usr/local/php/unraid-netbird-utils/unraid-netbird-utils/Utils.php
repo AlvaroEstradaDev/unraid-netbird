@@ -28,7 +28,7 @@ class Utils extends \EDACerton\PluginUtils\Utils
     {
         $debug = file_exists("/boot/config/plugins/netbird/debug");
 
-        if ($debug && !defined("PLUGIN_DEBUG")) {
+        if ($debug && ! defined("PLUGIN_DEBUG")) {
             error_reporting(E_ALL);
             define("PLUGIN_DEBUG", true);
         }
@@ -60,15 +60,15 @@ class Utils extends \EDACerton\PluginUtils\Utils
         }
 
         list($subnet, $mask) = explode('/', $network, 2);
-        $ip_bin_string = sprintf("%032b", ip2long($ip));
-        $net_bin_string = sprintf("%032b", ip2long($subnet));
+        $ip_bin_string       = sprintf("%032b", ip2long($ip));
+        $net_bin_string      = sprintf("%032b", ip2long($subnet));
 
         return (substr_compare($ip_bin_string, $net_bin_string, 0, intval($mask)) === 0);
     }
 
     public static function logwrap(string $message, bool $debug = false, bool $rateLimit = false): void
     {
-        if (!defined(__NAMESPACE__ . "\PLUGIN_NAME")) {
+        if ( ! defined(__NAMESPACE__ . "\PLUGIN_NAME")) {
             throw new \RuntimeException("PLUGIN_NAME is not defined.");
         }
         $utils = new Utils(PLUGIN_NAME);
@@ -80,7 +80,7 @@ class Utils extends \EDACerton\PluginUtils\Utils
      */
     public static function runwrap(string $command, bool $alwaysShow = false, bool $show = true): array
     {
-        if (!defined(__NAMESPACE__ . "\PLUGIN_NAME")) {
+        if ( ! defined(__NAMESPACE__ . "\PLUGIN_NAME")) {
             throw new \RuntimeException("PLUGIN_NAME is not defined.");
         }
         $utils = new Utils(PLUGIN_NAME);
@@ -134,7 +134,7 @@ class Utils extends \EDACerton\PluginUtils\Utils
      */
     public function get_assigned_ports(): array
     {
-        $ports = array();
+        $ports    = array();
         $identCfg = parse_ini_file("/boot/config/ident.cfg", false, INI_SCANNER_RAW) ?: array();
         if (isset($identCfg['PORT'])) {
             $ports[] = intval($identCfg['PORT']);
@@ -168,7 +168,7 @@ class Utils extends \EDACerton\PluginUtils\Utils
 
     public static function pageChecks(Translator $tr): bool
     {
-        static $config = null;
+        static $config   = null;
         static $localAPI = null;
 
         if ($config === null) {
@@ -178,14 +178,14 @@ class Utils extends \EDACerton\PluginUtils\Utils
             $localAPI = new LocalAPI();
         }
 
-        if (!$config->Enable) {
-            echo ($tr->tr("netbird_disabled"));
+        if ( ! $config->Enable) {
+            echo($tr->tr("netbird_disabled"));
             return false;
         }
 
-        if (!$localAPI->isReady()) {
-            echo ($tr->tr("warnings.not_ready"));
-            echo (<<<EOT
+        if ( ! $localAPI->isReady()) {
+            echo($tr->tr("warnings.not_ready"));
+            echo(<<<EOT
                 <script>
                     $(function() {
                         setTimeout(function() {

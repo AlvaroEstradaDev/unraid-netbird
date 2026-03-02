@@ -4,7 +4,7 @@
 namespace Netbird;
 
 require_once "include/common.php";
-if (!isset($utils)) {
+if ( ! isset($utils)) {
     throw new \Exception("Utils not initialized.");
 }
 

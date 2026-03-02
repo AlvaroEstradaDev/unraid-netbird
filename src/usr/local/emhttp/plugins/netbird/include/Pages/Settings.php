@@ -21,7 +21,7 @@ namespace Netbird;
 
 use EDACerton\PluginUtils\Translator;
 
-if (!defined(__NAMESPACE__ . '\PLUGIN_ROOT') || !defined(__NAMESPACE__ . '\PLUGIN_NAME')) {
+if ( ! defined(__NAMESPACE__ . '\PLUGIN_ROOT') || ! defined(__NAMESPACE__ . '\PLUGIN_NAME')) {
     throw new \RuntimeException("Common file not loaded.");
 }
 
@@ -29,8 +29,8 @@ $tr = $tr ?? new Translator(PLUGIN_ROOT);
 
 $netbirdConfig = $netbirdConfig ?? new Config();
 
-if ((!isset($var)) || (!isset($display))) {
-    echo ("Missing required WebGUI variables");
+if (( ! isset($var)) || ( ! isset($display))) {
+    echo("Missing required WebGUI variables");
     return;
 }
 
@@ -40,7 +40,7 @@ $netbirdDisconnect = " disabled";
 
 if ($netbirdConfig->Enable) {
     $netbirdInfo = $netbirdInfo ?? new Info($tr);
-    if (!$netbirdInfo->connectedViaTS()) {
+    if ( ! $netbirdInfo->connectedViaTS()) {
         $netbirdDisconnect = "";
     }
 }
@@ -69,7 +69,7 @@ if ($netbirdConfig->Enable) {
             <dd>
                 <select name='ENABLE_NETBIRD' size='1' class='narrow'>
                     <?= Utils::make_option($netbirdConfig->Enable, '1', $tr->tr("yes")); ?>
-                    <?= Utils::make_option(!$netbirdConfig->Enable, '0', $tr->tr("no")); ?>
+                    <?= Utils::make_option( ! $netbirdConfig->Enable, '0', $tr->tr("no")); ?>
                 </select>
             </dd>
         </dl>
@@ -79,7 +79,7 @@ if ($netbirdConfig->Enable) {
             <dd>
                 <select name='NO_LOGS_NO_SUPPORT' size='1' class='narrow'>
                     <?= Utils::make_option($netbirdConfig->NoLogsNoSupport, '1', $tr->tr("yes")); ?>
-                    <?= Utils::make_option(!$netbirdConfig->NoLogsNoSupport, '0', $tr->tr("no")); ?>
+                    <?= Utils::make_option( ! $netbirdConfig->NoLogsNoSupport, '0', $tr->tr("no")); ?>
                 </select>
             </dd>
         </dl>
@@ -90,7 +90,7 @@ if ($netbirdConfig->Enable) {
             <dd>
                 <select name='INCLUDE_INTERFACE' size='1' class='narrow'>
                     <?= Utils::make_option($netbirdConfig->IncludeInterface, '1', $tr->tr("yes")); ?>
-                    <?= Utils::make_option(!$netbirdConfig->IncludeInterface, '0', $tr->tr("no")); ?>
+                    <?= Utils::make_option( ! $netbirdConfig->IncludeInterface, '0', $tr->tr("no")); ?>
                 </select>
             </dd>
         </dl>
@@ -101,7 +101,7 @@ if ($netbirdConfig->Enable) {
             <dd>
                 <select name='SYSCTL_IP_FORWARD' size='1' class='narrow'>
                     <?= Utils::make_option($netbirdConfig->IPForward, '1', $tr->tr("yes")); ?>
-                    <?= Utils::make_option(!$netbirdConfig->IPForward, '0', $tr->tr("no")); ?>
+                    <?= Utils::make_option( ! $netbirdConfig->IPForward, '0', $tr->tr("no")); ?>
                 </select>
             </dd>
         </dl>
@@ -112,7 +112,7 @@ if ($netbirdConfig->Enable) {
             <dd>
                 <select name='USE_TPM' id='USE_TPM' onchange='showSettingWarning("tpm","#USE_TPM");' size='1'
                     class='narrow'>
-                    <?= Utils::make_option(!$netbirdConfig->UseTPM, '0', $tr->tr("no")); ?>
+                    <?= Utils::make_option( ! $netbirdConfig->UseTPM, '0', $tr->tr("no")); ?>
                     <?= Utils::make_option($netbirdConfig->UseTPM, '1', $tr->tr("yes")); ?>
                 </select>
             </dd>
@@ -136,7 +136,7 @@ if ($netbirdConfig->Enable) {
         <dt><?= $tr->tr("settings.hosts"); ?></dt>
         <dd>
             <select name='ADD_PEERS_TO_HOSTS' id='ADD_PEERS_TO_HOSTS' size='1' class='narrow'>
-                <?= Utils::make_option(!$netbirdConfig->AddPeersToHosts, '0', $tr->tr("no")); ?>
+                <?= Utils::make_option( ! $netbirdConfig->AddPeersToHosts, '0', $tr->tr("no")); ?>
                 <?= Utils::make_option($netbirdConfig->AddPeersToHosts, '1', $tr->tr("yes")); ?>
             </select>
         </dd>
@@ -177,7 +177,7 @@ if ($netbirdConfig->Enable) {
         <dd>
             <select name='ACCEPT_ROUTES' id='ACCEPT_ROUTES' onchange='showSettingWarning("subnet","#ACCEPT_ROUTES");'
                 size='1' class='narrow'>
-                <?= Utils::make_option(!$netbirdConfig->AllowRoutes, '0', $tr->tr("no")); ?>
+                <?= Utils::make_option( ! $netbirdConfig->AllowRoutes, '0', $tr->tr("no")); ?>
                 <?= Utils::make_option($netbirdConfig->AllowRoutes, '1', $tr->tr("yes")); ?>
             </select>
         </dd>
@@ -191,7 +191,7 @@ if ($netbirdConfig->Enable) {
         <dd>
             <select name='ACCEPT_DNS' id='ACCEPT_DNS' onchange='showSettingWarning("dns","#ACCEPT_DNS");' size='1'
                 class='narrow'>
-                <?= Utils::make_option(!$netbirdConfig->AllowDNS, '0', $tr->tr("no")); ?>
+                <?= Utils::make_option( ! $netbirdConfig->AllowDNS, '0', $tr->tr("no")); ?>
                 <?= Utils::make_option($netbirdConfig->AllowDNS, '1', $tr->tr("yes")); ?>
             </select>
         </dd>
@@ -202,19 +202,19 @@ if ($netbirdConfig->Enable) {
 
     <?php if (Utils::isFunnelAllowed()) { ?>
 
-            <dl>
-                <dt><?= $tr->tr("settings.funnel"); ?></dt>
-                <dd>
-                    <select name='ALLOW_FUNNEL' id='ALLOW_FUNNEL' onchange="showSettingWarning('funnel','#ALLOW_FUNNEL');"
-                        size='1' class='narrow'>
-                        <?= Utils::make_option(!$netbirdConfig->AllowFunnel, '0', $tr->tr("no")); ?>
-                        <?= Utils::make_option($netbirdConfig->AllowFunnel, '1', $tr->tr("yes")); ?>
-                    </select>
-                </dd>
-            </dl>
-            <blockquote class='inline_help'>
-                <?= $tr->tr("settings.context.funnel"); ?>
-            </blockquote>
+        <dl>
+            <dt><?= $tr->tr("settings.funnel"); ?></dt>
+            <dd>
+                <select name='ALLOW_FUNNEL' id='ALLOW_FUNNEL' onchange="showSettingWarning('funnel','#ALLOW_FUNNEL');"
+                    size='1' class='narrow'>
+                    <?= Utils::make_option( ! $netbirdConfig->AllowFunnel, '0', $tr->tr("no")); ?>
+                    <?= Utils::make_option($netbirdConfig->AllowFunnel, '1', $tr->tr("yes")); ?>
+                </select>
+            </dd>
+        </dl>
+        <blockquote class='inline_help'>
+            <?= $tr->tr("settings.context.funnel"); ?>
+        </blockquote>
 
     <?php } ?>
 
@@ -254,23 +254,23 @@ if ($netbirdConfig->Enable) {
 </form>
 
 <?php if (file_exists('/usr/local/emhttp/plugins/plugin-diagnostics/download.php')) { ?>
-        <table class="unraid tablesorter">
-            <thead>
-                <tr>
-                    <td><?= $tr->tr("settings.diagnostics"); ?></td>
-                </tr>
-            </thead>
-        </table>
+    <table class="unraid tablesorter">
+        <thead>
+            <tr>
+                <td><?= $tr->tr("settings.diagnostics"); ?></td>
+            </tr>
+        </thead>
+    </table>
 
-        <form method="GET" action="/plugins/plugin-diagnostics/download.php" target="_blank">
-            <input type="hidden" name="plugin" value="netbird">
-            <dl>
-                <dt><?= $tr->tr("settings.context.diagnostics"); ?></dt>
-                <dd>
-                    <span><input type="submit" value="<?= $tr->tr('Download'); ?> "></span>
-                </dd>
-            </dl>
-        </form>
+    <form method="GET" action="/plugins/plugin-diagnostics/download.php" target="_blank">
+        <input type="hidden" name="plugin" value="netbird">
+        <dl>
+            <dt><?= $tr->tr("settings.context.diagnostics"); ?></dt>
+            <dd>
+                <span><input type="submit" value="<?= $tr->tr('Download'); ?> "></span>
+            </dd>
+        </dl>
+    </form>
 
 <?php } ?>
 

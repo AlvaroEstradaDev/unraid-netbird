@@ -23,15 +23,15 @@ use EDACerton\PluginUtils\Translator;
 
 enum NotificationType: string
 {
-    case NORMAL = 'normal';
+    case NORMAL  = 'normal';
     case WARNING = 'warning';
-    case ALERT = 'alert';
+    case ALERT   = 'alert';
 }
 
 class System extends \EDACerton\PluginUtils\System
 {
     public const RESTART_COMMAND = "/usr/local/emhttp/webGui/scripts/reload_services";
-    public const NOTIFY_COMMAND = "/usr/local/emhttp/webGui/scripts/notify";
+    public const NOTIFY_COMMAND  = "/usr/local/emhttp/webGui/scripts/notify";
 
     public static function addToHostFile(\stdClass $status): void
     {
@@ -50,7 +50,7 @@ class System extends \EDACerton\PluginUtils\System
         // Add all peers to /etc/hosts, except those with the tag 'tag:mullvad-exit-node'
         if (isset($status->Peer) && is_object($status->Peer)) {
             foreach ((array) $status->Peer as $k => $peer) {
-                if (!($peer instanceof \stdClass)) {
+                if ( ! ($peer instanceof \stdClass)) {
                     continue;
                 }
                 if (isset($peer->Tags) && is_array($peer->Tags) && in_array('tag:mullvad-exit-node', $peer->Tags, true)) {
@@ -101,7 +101,7 @@ class System extends \EDACerton\PluginUtils\System
             if (is_resource($connection)) {
                 Utils::logwrap("WebGUI listening on {$netbird_ipv4}:{$ident_config['PORT']}", false, true);
             } else {
-                if (!$allowRestart) {
+                if ( ! $allowRestart) {
                     Utils::logwrap("WebGUI not listening on {$netbird_ipv4}:{$ident_config['PORT']}, waiting for next check");
                     return true;
                 }
@@ -139,7 +139,7 @@ class System extends \EDACerton\PluginUtils\System
         $ip_route = (array) json_decode(implode(Utils::runwrap('ip -j route get 8.8.8.8')), true);
 
         // Check if a device was returned
-        if (!isset($ip_route[0]['dev'])) {
+        if ( ! isset($ip_route[0]['dev'])) {
             Utils::logwrap("Default interface could not be detected.");
             return;
         }
@@ -149,7 +149,7 @@ class System extends \EDACerton\PluginUtils\System
         /** @var array<string, array<string>> $ethtool */
         $ethtool = ((array) json_decode(implode(Utils::runwrap("ethtool --json -k {$dev}")), true))[0];
 
-        if (isset($ethtool['rx-udp-gro-forwarding']) && !$ethtool['rx-udp-gro-forwarding']['active']) {
+        if (isset($ethtool['rx-udp-gro-forwarding']) && ! $ethtool['rx-udp-gro-forwarding']['active']) {
             Utils::runwrap("ethtool -K {$dev} rx-udp-gro-forwarding on");
         }
 
@@ -161,14 +161,14 @@ class System extends \EDACerton\PluginUtils\System
     public static function notifyOnKeyExpiration(): void
     {
         $localAPI = new LocalAPI();
-        $status = $localAPI->getStatus();
+        $status   = $localAPI->getStatus();
 
         if (isset($status->Self->KeyExpiry)) {
             $expiryTime = new \DateTime($status->Self->KeyExpiry);
             $expiryTime->setTimezone(new \DateTimeZone(date_default_timezone_get()));
             $interval = $expiryTime->diff(new \DateTime('now'));
 
-            $expiryPrint = $expiryTime->format(\DateTimeInterface::RFC7231);
+            $expiryPrint   = $expiryTime->format(\DateTimeInterface::RFC7231);
             $intervalPrint = $interval->format('%a');
 
             $message = "The Netbird key will expire in {$intervalPrint} days on {$expiryPrint}.";
@@ -202,11 +202,11 @@ class System extends \EDACerton\PluginUtils\System
     public static function setExtraInterface(Config $config): void
     {
         if (file_exists(self::RESTART_COMMAND)) {
-            $include_array = array();
+            $include_array      = array();
             $exclude_interfaces = "";
-            $write_file = true;
+            $write_file         = true;
             $network_extra_file = '/boot/config/network-extra.cfg';
-            $ifname = 'netbird1';
+            $ifname             = 'netbird1';
 
             if (file_exists($network_extra_file)) {
                 $netExtra = parse_ini_file($network_extra_file);

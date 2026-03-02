@@ -26,7 +26,7 @@ class Warning
 
     public function __construct(string $message = "", string $priority = "system")
     {
-        $this->Message = $message;
+        $this->Message  = $message;
         $this->Priority = $priority;
     }
 }

@@ -30,18 +30,18 @@ class Watcher
 
     public function run(): void
     {
-        $timer = 15;
-        $need_ip = true;
+        $timer               = 15;
+        $need_ip             = true;
         $allow_check_restart = false;
 
-        if (!defined(__NAMESPACE__ . '\PLUGIN_ROOT') || !defined(__NAMESPACE__ . '\PLUGIN_NAME')) {
+        if ( ! defined(__NAMESPACE__ . '\PLUGIN_ROOT') || ! defined(__NAMESPACE__ . '\PLUGIN_NAME')) {
             throw new \RuntimeException("Common file not loaded.");
         }
         $utils = new Utils(PLUGIN_NAME);
 
         $utils->logmsg("Starting netbird-watcher");
 
-        while (!file_exists('/var/local/emhttp/var.ini')) {
+        while ( ! file_exists('/var/local/emhttp/var.ini')) {
             $utils->logmsg("Waiting for system to finish booting");
             sleep(10);
         }
@@ -57,7 +57,7 @@ class Watcher
                     if (isset($interface["address"])) {
                         if ($interface["family"] == 2) {
                             $netbird_ipv4 = $interface["address"];
-                            $timer = 60;
+                            $timer        = 60;
                         }
                     }
                 }
@@ -69,7 +69,7 @@ class Watcher
                     $need_ip = false;
 
                     $localAPI = new LocalAPI();
-                    $status = $localAPI->getStatus();
+                    $status   = $localAPI->getStatus();
 
                     $utils->run_task('Netbird\System::applyGRO');
                     $utils->run_task('Netbird\System::restartSystemServices', array($this->config));

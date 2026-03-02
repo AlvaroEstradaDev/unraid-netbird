@@ -24,13 +24,13 @@ use EDACerton\PluginUtils\Translator;
 $docroot = $docroot ?? $_SERVER['DOCUMENT_ROOT'] ?: '/usr/local/emhttp';
 require_once "{$docroot}/plugins/netbird/include/common.php";
 
-if (!defined(__NAMESPACE__ . '\PLUGIN_ROOT') || !defined(__NAMESPACE__ . '\PLUGIN_NAME')) {
+if ( ! defined(__NAMESPACE__ . '\PLUGIN_ROOT') || ! defined(__NAMESPACE__ . '\PLUGIN_NAME')) {
     throw new \RuntimeException("Common file not loaded.");
 }
 
 $tr = $tr ?? new Translator(PLUGIN_ROOT);
 
-if (!Utils::pageChecks($tr)) {
+if ( ! Utils::pageChecks($tr)) {
     return;
 }
 
