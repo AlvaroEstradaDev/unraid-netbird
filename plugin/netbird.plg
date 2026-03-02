@@ -4,7 +4,7 @@
 <PLUGIN 
   name="netbird"
   author="Alvaro Estrada"
-  version="2026.03.02.2314"
+  version="2026.03.02.2347"
   launch="Settings/Netbird"
   pluginURL="https://raw.githubusercontent.com/AlvaroEstradaDev/unraid-netbird/main/plugin/netbird.plg"
   support="https://forums.unraid.net/topic/"
@@ -15,6 +15,40 @@
 
 <CHANGES>
 <![CDATA[
+
+### 2026.03.02.2347
+
+## Bug Fixes
+
+### Settings Page Auto-Refresh Issue (ROOT CAUSE FIXED!)
+- **Removed** 5-second auto-refresh script from `Utils::pageChecks()` function
+- **Fixed** issue where Info tab triggered page-wide refresh affecting Settings tab
+- **Removed** unnecessary timer clearing code from Settings page
+
+### Root Cause Analysis
+The auto-refresh was caused by:
+1. Unraid's tabbed interface loads all tabs in the background
+2. When Netbird wasn't ready, the Info tab called `Utils::pageChecks()`
+3. This function displayed "Netbird is not yet ready" and set a 5-second refresh timer
+4. The timer refreshed the **entire page**, clearing any form data in the Settings tab
+
+### Solution
+- Removed the forced auto-refresh - users can manually refresh when ready
+- This prevents data loss on the Settings page
+- Better UX - no unexpected page refreshes
+
+## Technical Details
+
+### Files Modified
+- `Utils.php`: Removed auto-refresh JavaScript from `pageChecks()` method
+- `Settings.php`: Removed aggressive timer clearing code (no longer needed)
+
+### Impact
+- Settings page will no longer auto-refresh and clear form inputs
+- Users will see "Netbird is not yet ready" message but can choose when to refresh
+- All tabs are now stable and won't unexpectedly refresh
+
+**Full Changelog**: https://github.com/AlvaroEstradaDev/unraid-netbird/compare/2026.03.02.2314...2026.03.02.2347
 
 ### 2026.03.02.2314
 
@@ -60,28 +94,6 @@ This should finally resolve the issue where the Settings page would auto-refresh
 
 **Full Changelog**: https://github.com/AlvaroEstradaDev/unraid-netbird/compare/2026.03.02.2300...2026.03.02.2307
 
-### 2026.03.02.2300
-
-## Bug Fixes
-
-### Settings Page Auto-Refresh Issue
-- **Fixed** auto-refresh timer not being properly cleared on Settings page
- - Now clears `timers.refresh` in document-ready handler with safety checks
- - Prevents form data loss when navigating to Settings from other pages
-
-### Duplicate Release Workflow Runs
-- **Fixed** duplicate release workflow executions
- - Removed `published` event trigger from release.yml (redundant with `released`)
- - Workflow now only triggers on `released` and `prereleased` events
-
-## Technical Details
-
-### Files Modified
-- `Settings.php`: Improved timer clearing logic with proper initialization checks
-- `release.yml`: Removed duplicate `published` trigger to prevent double workflow runs
-
-**Full Changelog**: https://github.com/AlvaroEstradaDev/unraid-netbird/compare/2026.03.02.2249...2026.03.02.2300
-
 
 For older releases, see https://github.com/AlvaroEstradaDev/unraid-netbird/releases
 ]]>
@@ -124,9 +136,9 @@ if ($oldPlugin !== "") {
 <SHA256>10196c855c4ebd849e54325dde3b8727bc91c070b75a7abf9325326c0a7c72f6</SHA256>
 </FILE>
 
-<FILE Name="/boot/config/plugins/netbird/unraid-netbird-utils-2026.03.02.2314-noarch-1.txz">
-<URL>https://github.com/AlvaroEstradaDev/unraid-netbird/releases/download/2026.03.02.2314/unraid-netbird-utils-2026.03.02.2314-noarch-1.txz</URL>
-<SHA256>d0882ea0968c70cb05dfa0183a9e5dc9b6acf29df9dfdf6796cc9261b53930a6</SHA256>
+<FILE Name="/boot/config/plugins/netbird/unraid-netbird-utils-2026.03.02.2347-noarch-1.txz">
+<URL>https://github.com/AlvaroEstradaDev/unraid-netbird/releases/download/2026.03.02.2347/unraid-netbird-utils-2026.03.02.2347-noarch-1.txz</URL>
+<SHA256>93fbd0d21d8f70a8470d27e5572901a09528948bbfc78ae70cda33f51ab78e83</SHA256>
 </FILE>
 
 <!--
@@ -144,7 +156,7 @@ if [ -L "/etc/rc.d/rc.netbird" ]; then
     rm -f /etc/rc.d/rc.netbird
 fi
 
-upgradepkg --install-new /boot/config/plugins/netbird/unraid-netbird-utils-2026.03.02.2314-noarch-1.txz
+upgradepkg --install-new /boot/config/plugins/netbird/unraid-netbird-utils-2026.03.02.2347-noarch-1.txz
 
 mkdir -p /usr/local/emhttp/plugins/netbird/bin
 tar xzf /boot/config/plugins/netbird/0.66.0.tar.gz -C /usr/local/emhttp/plugins/netbird/bin netbird
@@ -169,7 +181,7 @@ rm -f /var/log/plugins/netbird-trunk.plg
 netbird completion bash > /etc/bash_completion.d/netbird
 
 # cleanup old versions
-rm -f $(ls /boot/config/plugins/netbird/unraid-netbird-utils-*.txz 2>/dev/null | grep -v '2026.03.02.2314')
+rm -f $(ls /boot/config/plugins/netbird/unraid-netbird-utils-*.txz 2>/dev/null | grep -v '2026.03.02.2347')
 rm -f $(ls /boot/config/plugins/netbird/*.tar.gz 2>/dev/null | grep -v '0.66.0')
 
 # check to see if the state file has been backed up to Unraid Connect
@@ -193,7 +205,7 @@ fi
 echo ""
 echo "----------------------------------------------------"
 echo " netbird has been installed."
-echo " Version: 2026.03.02.2314"
+echo " Version: 2026.03.02.2347"
 echo "----------------------------------------------------"
 echo ""
 ]]>
