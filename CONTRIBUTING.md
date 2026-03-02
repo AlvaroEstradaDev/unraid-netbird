@@ -18,8 +18,6 @@ Thank you for your interest in contributing to **unraid-netbird-utils**!
 
 New strings should be added to `src/usr/local/emhttp/plugins/netbird/locales/en_US.json`.
 
-Translations are managed via Crowdin (https://translate.edac.dev/)
-
 ## Code Quality & Checks
 
 This repository uses automated code checks via GitHub Actions ([.github/workflows/lint.yml](.github/workflows/lint.yml)):
