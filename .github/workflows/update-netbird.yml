@@ -73,7 +73,7 @@ jobs:
       - name: Create or update PR
         if: steps.compare.outputs.update == 'true' && steps.commit.outputs.made == 'true'
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GIT_TOKEN }}
         run: |
           gh pr create \
             --title "chore: update Netbird to ${{ steps.compare.outputs.latest }}" \
