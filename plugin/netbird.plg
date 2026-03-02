@@ -51,7 +51,7 @@ if ($oldPlugin !== "") {
 </FILE>
 
 <FILE Name="/boot/config/plugins/netbird/unraid-netbird-utils-2026.01.27.2240-noarch-1.txz">
-<URL>https://github.com/unraid/unraid-netbird/releases/download/2026.01.27.2240/unraid-netbird-utils-2026.01.27.2240-noarch-1.txz</URL>
+<URL>https://github.com/AlvaroEstradaDev/unraid-netbird/releases/download/2026.01.27.2240/unraid-netbird-utils-2026.01.27.2240-noarch-1.txz</URL>
 <SHA256>581467e4ae1659fd2a5161cef999517c36d5a22dabcbd27531b0f6eb019b2204</SHA256>
 </FILE>
 

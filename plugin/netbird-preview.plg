@@ -6,7 +6,7 @@
   author="Alvaro Estrada"
   version="2026.02.16.0429"
   launch="Settings/Netbird"
-  pluginURL="https://raw.githubusercontent.com/unraid/unraid-netbird/preview/plugin/netbird-preview.plg"
+  pluginURL="https://raw.githubusercontent.com/AlvaroEstradaDev/unraid-netbird/preview/plugin/netbird-preview.plg"
   support="https://forums.unraid.net/topic/136889-plugin-netbird/"
   min="7.0.0"
   
@@ -20,27 +20,27 @@
 
 ### 🚀 Features
 
-- Better handing of serve configuration ([#100](https://github.com/unraid/unraid-netbird/pull/100))
+- Better handing of serve configuration ([#100](https://github.com/AlvaroEstradaDev/unraid-netbird/pull/100))
 
 ### 🧰 Maintenance
 
-- Update Netbird to 1.94.2 ([#99](https://github.com/unraid/unraid-netbird/pull/99))
+- Update Netbird to 1.94.2 ([#99](https://github.com/AlvaroEstradaDev/unraid-netbird/pull/99))
 
 ### 2026.01.27.2240
 
 ### 🧰 Maintenance
 
-- Update Netbird to 1.94.1 ([#97](https://github.com/unraid/unraid-netbird/pull/97))
-- Update composer, add php version ([#96](https://github.com/unraid/unraid-netbird/pull/96)) 
+- Update Netbird to 1.94.1 ([#97](https://github.com/AlvaroEstradaDev/unraid-netbird/pull/97))
+- Update composer, add php version ([#96](https://github.com/AlvaroEstradaDev/unraid-netbird/pull/96)) 
 
 ### 2026.01.08.0308
 
 ### 🧰 Maintenance
 
-- Update Netbird to 1.92.5 ([#94](https://github.com/unraid/unraid-netbird/pull/94)) 
+- Update Netbird to 1.92.5 ([#94](https://github.com/AlvaroEstradaDev/unraid-netbird/pull/94)) 
 
 
-For older releases, see https://github.com/unraid/unraid-netbird/releases
+For older releases, see https://github.com/AlvaroEstradaDev/unraid-netbird/releases
 ]]>
 </CHANGES>
 
@@ -58,7 +58,7 @@ if (!file_exists('/var/local/emhttp/var.ini') || !isset($unraidVersion['version'
 }
 
 if (version_compare($unraidVersion['version'], '7.1', '<')) {
-    $oldPlugin = "https://raw.githubusercontent.com/unraid/unraid-netbird/refs/tags/unraid-7.0/plugin/netbird-preview.plg";
+    $oldPlugin = "https://raw.githubusercontent.com/AlvaroEstradaDev/unraid-netbird/refs/tags/unraid-7.0/plugin/netbird-preview.plg";
 }
 
 if ($oldPlugin !== "") {
@@ -82,7 +82,7 @@ if ($oldPlugin !== "") {
 </FILE>
 
 <FILE Name="/boot/config/plugins/netbird/unraid-netbird-utils-2026.02.16.0429-noarch-1.txz">
-<URL>https://github.com/unraid/unraid-netbird/releases/download/2026.02.16.0429/unraid-netbird-utils-2026.02.16.0429-noarch-1.txz</URL>
+<URL>https://github.com/AlvaroEstradaDev/unraid-netbird/releases/download/2026.02.16.0429/unraid-netbird-utils-2026.02.16.0429-noarch-1.txz</URL>
 <SHA256>0055ca26dd7dae771249cfe3462999edbd9b14b3a554ef02a777808a6e0fd0d2</SHA256>
 </FILE>
 
