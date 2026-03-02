@@ -19,16 +19,10 @@
 
 namespace Netbird;
 
-enum APIMethods
-{
-    case GET;
-    case POST;
-    case PATCH;
-}
 
 class LocalAPI
 {
-    private const netbirdSocket = '/var/run/netbird/netbird.sock';
+
     private Utils $utils;
 
     public function __construct()
@@ -39,57 +33,7 @@ class LocalAPI
         $this->utils = new Utils(PLUGIN_NAME);
     }
 
-    private function netbirdLocalAPI(string $url, APIMethods $method = APIMethods::GET, object $body = new \stdClass()): string
-    {
-        if (empty($url)) {
-            throw new \InvalidArgumentException("URL cannot be empty");
-        }
 
-        $body_encoded = json_encode($body, JSON_UNESCAPED_SLASHES);
-
-        if (!$body_encoded) {
-            throw new \InvalidArgumentException("Failed to encode JSON");
-        }
-
-        $ch = curl_init();
-
-        $headers = [];
-
-        curl_setopt($ch, CURLOPT_TIMEOUT, 5);
-        curl_setopt($ch, CURLOPT_UNIX_SOCKET_PATH, $this::netbirdSocket);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_URL, "http://local-netbird.sock/localapi/{$url}");
-
-        if ($method == APIMethods::POST) {
-            curl_setopt($ch, CURLOPT_POST, true);
-            curl_setopt($ch, CURLOPT_POSTFIELDS, $body_encoded);
-            $this->utils->logmsg("Netbird Local API: {$url} POST " . $body_encoded);
-            $headers[] = "Content-Type: application/json";
-        }
-
-        if ($method == APIMethods::PATCH) {
-            curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'PATCH');
-            curl_setopt($ch, CURLOPT_POSTFIELDS, $body_encoded);
-            $this->utils->logmsg("Netbird Local API: {$url} PATCH " . $body_encoded);
-            $headers[] = "Content-Type: application/json";
-        }
-
-        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-
-        $out = curl_exec($ch);
-        $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        curl_close($ch);
-
-        if ($out === false) {
-            throw new \RuntimeException("Netbird Local API request failed for URL: {$url}");
-        }
-
-        if ($http_code < 200 || $http_code >= 300) {
-            throw new \RuntimeException("Netbird Local API returned HTTP {$http_code} for URL: {$url}");
-        }
-
-        return strval($out);
-    }
 
     private function decodeJSONResponse(string $response): \stdClass
     {
@@ -126,7 +70,7 @@ class LocalAPI
             $mapped->Version = $raw->daemonVersion ?? '';
             $mapped->Self = new \stdClass();
             $mapped->Self->Online = $raw->management->connected ?? false;
-            $mapped->Self->HostName = explode('.', $raw->fqdn ?? '')[0] ?? '';
+            $mapped->Self->HostName = explode('.', $raw->fqdn ?? '')[0];
             $mapped->Self->DNSName = $raw->fqdn ?? '';
             $ips = [];
             if (isset($raw->netbirdIp)) {
@@ -143,7 +87,7 @@ class LocalAPI
                     $p->NetbirdIPs = [$peer->netbirdIp];
                     $p->Online = $peer->status === "Connected";
                     $p->Active = $peer->status === "Connected";
-                    $p->Relay = isset($peer->relayAddress) && $peer->connectionType === "Relayed" ? $peer->relayAddress : "";
+                    $p->Relay = isset($peer->relayAddress) && isset($peer->connectionType) && $peer->connectionType === "Relayed" ? $peer->relayAddress : "";
                     $p->CurAddr = $peer->iceCandidateEndpoint->remote ?? "";
                     $p->TxBytes = $peer->transferSent ?? 0;
                     $p->RxBytes = $peer->transferReceived ?? 0;

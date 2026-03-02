@@ -28,7 +28,9 @@ class Info
     private ?Translator $tr;
     private LocalAPI $localAPI;
     private \stdClass $status;
+    /** @var array<string, bool> */
     private array $routes;
+    /** @var array<string, string> */
     private array $pluginConfig;
 
     public function __construct(?Translator $tr)
@@ -150,6 +152,9 @@ class Info
         return null;
     }
 
+    /**
+     * @return array<int, PeerStatus>
+     */
     public function getPeerStatus(): array
     {
         $result = array();
@@ -227,7 +232,7 @@ class Info
     {
         if (file_exists('/tmp/netbird-login.log')) {
             $content = file_get_contents('/tmp/netbird-login.log');
-            if (preg_match('/(https:\/\/\S+?(?:auth|login)\S*)/i', $content, $matches)) {
+            if ($content !== false && preg_match('/(https:\/\/\S+?(?:auth|login)\S*)/i', $content, $matches)) {
                 return $matches[1];
             }
         }
@@ -239,6 +244,9 @@ class Info
         return !$this->isOnline();
     }
 
+    /**
+     * @return array<int, string>
+     */
     public function getAdvertisedRoutes(): array
     {
         return array_keys($this->routes);
