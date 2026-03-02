@@ -4,7 +4,7 @@
 <PLUGIN 
   name="netbird"
   author="Alvaro Estrada"
-  version="2026.03.02.2307"
+  version="2026.03.02.2314"
   launch="Settings/Netbird"
   pluginURL="https://raw.githubusercontent.com/AlvaroEstradaDev/unraid-netbird/preview/plugin/netbird-preview.plg"
   support="https://forums.unraid.net/topic/"
@@ -15,6 +15,32 @@
 
 <CHANGES>
 <![CDATA[
+
+### 2026.03.02.2314
+
+## Bug Fixes
+
+### Settings Page Auto-Refresh Issue (Aggressive Fix)
+- **Implemented** continuous timer clearing to prevent auto-refresh
+- **Clears timer** immediately, then at 100ms, 500ms, and 1000ms after page load
+- **Continuously monitors** and clears timer every 500ms for the first 10 seconds
+- **Handles** edge case where Unraid framework sets timer after initial page load
+
+This aggressive approach should finally prevent the Settings page from auto-refreshing and clearing form inputs every 5 seconds.
+
+## Technical Details
+
+### Implementation
+The fix uses multiple strategies:
+1. Immediate timer clearing on script execution
+2. Delayed clearing at multiple intervals (100ms, 500ms, 1000ms)
+3. Continuous polling every 500ms for 10 seconds
+4. Defensive checks to ensure `timers` object exists
+
+### Files Modified
+- `Settings.php`: Enhanced timer clearing with IIFE pattern and continuous monitoring
+
+**Full Changelog**: https://github.com/AlvaroEstradaDev/unraid-netbird/compare/2026.03.02.2307...2026.03.02.2314
 
 ### 2026.03.02.2307
 
@@ -55,38 +81,6 @@ This should finally resolve the issue where the Settings page would auto-refresh
 - `release.yml`: Removed duplicate `published` trigger to prevent double workflow runs
 
 **Full Changelog**: https://github.com/AlvaroEstradaDev/unraid-netbird/compare/2026.03.02.2249...2026.03.02.2300
-
-### 2026.03.02.2249
-
-## Bug Fixes
-
-### Settings Page Auto-Refresh Issue
-- **Fixed** auto-refresh clearing form inputs on Settings page by properly clearing `timers.refresh` (#7)
-
-## Improvements
-
-### Removed Legacy Tailscale Code
-- **Removed** Taildrop feature (Tailscale-only, not supported by Netbird)
-- **Removed** `no_logs_no_support` setting (Tailscale-specific telemetry option)
-- **Removed** `USAGE` setting (unused legacy configuration)
-
-### Feature Implementation
-- **Implemented** WireGuard port setting to pass `--wireguard-port` to Netbird CLI when configured
-
-### Terminology Updates
-- **Updated** "MagicDNS" → "Netbird DNS" across all 15 locales
-- **Updated** "tailnet" → "network" across all 15 locales
-
-## Technical Details
-
-### Files Modified
-- `Settings.php`: Fixed auto-refresh bug, removed taildrop UI
-- `Config.php`: Removed unused configuration properties
-- `System.php`: Implemented WireGuard port parameter passing
-- `settings.json`: Cleaned up legacy settings
-- Updated all 15 locale files (de_DE, en_US, es_ES, fr_FR, it_IT, ja_JP, ko_KR, nl_NL, no_NO, pl_PL, pt_BR, pt_PT, sv_SE, uk_UA, zh_CN)
-
-**Full Changelog**: https://github.com/AlvaroEstradaDev/unraid-netbird/compare/2026.03.02.2214...2026.03.02.2249
 
 
 For older releases, see https://github.com/AlvaroEstradaDev/unraid-netbird/releases
@@ -130,9 +124,9 @@ if ($oldPlugin !== "") {
 <SHA256>10196c855c4ebd849e54325dde3b8727bc91c070b75a7abf9325326c0a7c72f6</SHA256>
 </FILE>
 
-<FILE Name="/boot/config/plugins/netbird/unraid-netbird-utils-2026.03.02.2307-noarch-1.txz">
-<URL>https://github.com/AlvaroEstradaDev/unraid-netbird/releases/download/2026.03.02.2307/unraid-netbird-utils-2026.03.02.2307-noarch-1.txz</URL>
-<SHA256>f4afb96250dd0c1ba812fff514a2da5f8df9de0b388f1ecdf3915b74b35172a1</SHA256>
+<FILE Name="/boot/config/plugins/netbird/unraid-netbird-utils-2026.03.02.2314-noarch-1.txz">
+<URL>https://github.com/AlvaroEstradaDev/unraid-netbird/releases/download/2026.03.02.2314/unraid-netbird-utils-2026.03.02.2314-noarch-1.txz</URL>
+<SHA256>d0882ea0968c70cb05dfa0183a9e5dc9b6acf29df9dfdf6796cc9261b53930a6</SHA256>
 </FILE>
 
 <!--
@@ -150,7 +144,7 @@ if [ -L "/etc/rc.d/rc.netbird" ]; then
     rm -f /etc/rc.d/rc.netbird
 fi
 
-upgradepkg --install-new /boot/config/plugins/netbird/unraid-netbird-utils-2026.03.02.2307-noarch-1.txz
+upgradepkg --install-new /boot/config/plugins/netbird/unraid-netbird-utils-2026.03.02.2314-noarch-1.txz
 
 mkdir -p /usr/local/emhttp/plugins/netbird/bin
 tar xzf /boot/config/plugins/netbird/0.66.0.tar.gz -C /usr/local/emhttp/plugins/netbird/bin netbird
@@ -177,7 +171,7 @@ sed -i "s/Netbird\*\*/Netbird (Preview)**/" /usr/local/emhttp/plugins/netbird/RE
 netbird completion bash > /etc/bash_completion.d/netbird
 
 # cleanup old versions
-rm -f $(ls /boot/config/plugins/netbird/unraid-netbird-utils-*.txz 2>/dev/null | grep -v '2026.03.02.2307')
+rm -f $(ls /boot/config/plugins/netbird/unraid-netbird-utils-*.txz 2>/dev/null | grep -v '2026.03.02.2314')
 rm -f $(ls /boot/config/plugins/netbird/*.tar.gz 2>/dev/null | grep -v '0.66.0')
 
 # check to see if the state file has been backed up to Unraid Connect
@@ -201,7 +195,7 @@ fi
 echo ""
 echo "----------------------------------------------------"
 echo " netbird has been installed."
-echo " Version: 2026.03.02.2307"
+echo " Version: 2026.03.02.2314"
 echo "----------------------------------------------------"
 echo ""
 ]]>
