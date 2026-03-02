@@ -100,17 +100,6 @@ if ($netbirdConfig->Enable) {
         </dl>
 
         <dl>
-            <dt><?= $tr->tr("settings.no_logs_no_support"); ?></dt>
-            <dd>
-                <select name='NO_LOGS_NO_SUPPORT' size='1' class='narrow'>
-                    <?= Utils::make_option($netbirdConfig->NoLogsNoSupport, '1', $tr->tr("yes")); ?>
-                    <?= Utils::make_option( ! $netbirdConfig->NoLogsNoSupport, '0', $tr->tr("no")); ?>
-                </select>
-            </dd>
-        </dl>
-        <blockquote class='inline_help'><?= $tr->tr("settings.context.no_logs_no_support"); ?></blockquote>
-
-        <dl>
             <dt><?= $tr->tr("settings.unraid_listen"); ?></dt>
             <dd>
                 <select name='INCLUDE_INTERFACE' size='1' class='narrow'>
@@ -146,16 +135,6 @@ if ($netbirdConfig->Enable) {
             <?= $tr->tr("settings.context.tpm"); ?>
         </blockquote>
     </div>
-
-    <dl>
-        <dt><?= $tr->tr("settings.taildrop"); ?></dt>
-        <dd>
-            <input type="text" id="taildropdir" name="TAILDROP_DIR" autocomplete="off" spellcheck="false" class="narrow"
-                data-pickfolders="true" data-pickfilter="HIDE_FILES_FILTER" data-pickroot="/mnt" pattern="^[^\\]*/$"
-                value="<?= htmlspecialchars($netbirdConfig->TaildropDir); ?>">
-        </dd>
-    </dl>
-    <blockquote class='inline_help'><?= $tr->tr("settings.context.taildrop"); ?></blockquote>
 
     <dl>
         <dt><?= $tr->tr("settings.hosts"); ?></dt>
@@ -340,6 +319,8 @@ if ($netbirdConfig->Enable) {
 <script src="<?= Utils::auto_v('/webGui/javascript/jquery.filetree.js'); ?>"></script>
 <script src="<?= Utils::auto_v('/webGui/javascript/jquery.switchbutton.js'); ?>"></script>
 <script>
+    clearTimeout(timers.refresh);
+    
     function requestErase(e)
     {
         e.disabled = true;
@@ -350,8 +331,6 @@ if ($netbirdConfig->Enable) {
 <script>
     $(function ()
     {
-        <?= ($var['fsState'] == 'Started') ? "$('#taildropdir').fileTreeAttach();" : ""; ?>
-
         if ($.cookie('netbird_view_mode') == 'advanced')
         {
             $('.advanced').show();

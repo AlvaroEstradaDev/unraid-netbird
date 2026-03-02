@@ -255,6 +255,10 @@ class System extends \EDACerton\PluginUtils\System
             $custom_params .= " --allow-server-ssh";
         }
 
+        if ($config->WgPort > 0 && $config->WgPort <= 65535) {
+            $custom_params .= " --wireguard-port " . intval($config->WgPort);
+        }
+
         file_put_contents('/usr/local/emhttp/plugins/netbird/custom-params.sh', 'NETBIRD_CUSTOM_PARAMS="' . $custom_params . '"');
     }
 }

@@ -26,7 +26,6 @@
         "enable_netbird": "Włącz Netbird",
         "unraid_listen": "Usługi Unraid nasłuchują na adresie IP Netbird",
         "ip_forward": "Włącz przekazywanie IP",
-        "taildrop": "Lokalizacja Taildrop",
         "services": "Usługi Netbird",
         "wireguard": "Port Wireguard",
         "outbound_network": "Zaawansowane opcje sieciowe",
@@ -39,13 +38,11 @@
         "reauthenticate": "Ponowna autoryzacja",
         "funnel": "Zezwól na Netbird Funnel",
         "hosts": "Dodaj peerów do /etc/hosts",
-        "no_logs_no_support": "Brak dzienników, brak wsparcia",
         "tpm": "Zezwól TPM na szyfrowanie klucza węzła",
         "context": {
             "tpm": "Umożliwia użycie TPM (Trusted Platform Module) do bezpiecznego przechowywania klucza węzła Netbird. Zwiększa to bezpieczeństwo, chroniąc klucz węzła przed łatwym wydobyciem i zapewniając, że tylko autoryzowany sprzęt może mieć do niego dostęp. Włączenie tej opcji wymaga TPM 2.0. Jeśli system nie posiada kompatybilnego TPM, opcja ta nie ma wpływu.",
             "unraid_listen": "Konfiguruje usługi Unraid (SSH, WebGUI, SMB itd.), aby nasłuchiwały na adresach Netbird.",
             "ip_forward": "Ustawia net.ipv4.ip_forward oraz net.ipv6.conf.all.forwarding na 1 w sysctl. Ta zmiana następuje natychmiast po włączeniu.",
-            "taildrop": "Określ ścieżkę dla przychodzących plików Taildrop.",
             "dns": "Pozwala na włączenie DNS Netbird przez CLI lub WebGUI. Po wyłączeniu, DNS Netbird będzie wyłączony po uruchomieniu Netbird.",
             "subnets": "Pozwala na włączenie tras Netbird przez CLI lub WebGUI. Po wyłączeniu, trasy Netbird będą wyłączone po uruchomieniu Netbird.",
             "wireguard": "Zmień port używany do połączeń Wireguard. Zazwyczaj nie ma potrzeby go zmieniać.",
@@ -55,8 +52,7 @@
             "save": "Netbird zostanie zrestartowany po zastosowaniu zmian",
             "reauthenticate": "Wymuś ponowną autoryzację Netbird.",
             "funnel": "Pozwala na włączenie Netbird Funnel przez WebGUI. Po wyłączeniu, Netbird Funnel zostanie wyłączony.",
-            "hosts": "Dodaje peerów Netbird do /etc/hosts w celu rozwiązywania nazw. Jest to przydatne, jeśli chcesz używać nazw DNS Tailnet, bez potencjalnych komplikacji wynikających z włączenia DNS Netbird na serwerze.",
-            "no_logs_no_support": "Wyłącza telemetrię Netbird i rezygnujesz tym samym z otrzymania wsparcia od Netbird, które wymagałoby tej telemetrii do debugowania."
+            "hosts": "Dodaje peerów Netbird do /etc/hosts w celu rozwiązywania nazw. Jest to przydatne, jeśli chcesz używać nazw DNS Network, bez potencjalnych komplikacji wynikających z włączenia DNS Netbird na serwerze."
         }
     },
     "info": {
@@ -81,7 +77,7 @@
         "not_ready": "Netbird nie jest jeszcze gotowe.",
         "funnel": "Włączenie Netbird Funnel dla WebGUI Unraid wystawia Twój serwer na internet, znacząco zwiększając ryzyko nieautoryzowanego dostępu oraz potencjalnych ataków. Funkcję tę należy włączać jedynie, jeśli w pełni rozumiesz jej wpływ na bezpieczeństwo. Zalecaną i bezpieczniejszą metodą zdalnego dostępu jest instalacja Netbird na urządzeniach, z których planujesz korzystać z WebGUI, zamiast włączać Netbird Funnel.",
         "subnet": "Akceptowanie podsieci Netbird na Twoim serwerze Unraid może zakłócić łączność w sieci lokalnej w niektórych konfiguracjach. Akceptacja tras nie jest wymagana, aby Unraid działał jako router podsieci lub węzeł wyjściowy. Włącz tę opcję tylko wtedy, gdy Twój serwer Unraid potrzebuje połączyć się z podsieciami reklamowanymi przez inne urządzenia.",
-        "dns": "Włączenie MagicDNS Netbird na serwerze może zakłócić rozwiązywanie nazw w kontenerach Docker, co może powodować problemy z łącznością aplikacji. Nie musisz włączać MagicDNS na serwerze, aby uzyskiwać dostęp do serwera Unraid przy użyciu nazw MagicDNS (np. \"unraid.tailnet.ts.net\") z innych urządzeń. Włączenie opcji \"Dodaj peerów do /etc/hosts\" to bezpieczniejsza alternatywa, która pozwala na używanie nazw Netbird na serwerze.",
+        "dns": "Włączenie Netbird DNS na serwerze może zakłócić rozwiązywanie nazw w kontenerach Docker, co może powodować problemy z łącznością aplikacji. Nie musisz włączać Netbird DNS na serwerze, aby uzyskiwać dostęp do serwera Unraid przy użyciu nazw Netbird DNS (np. \"unraid.network.ts.net\") z innych urządzeń. Włączenie opcji \"Dodaj peerów do /etc/hosts\" to bezpieczniejsza alternatywa, która pozwala na używanie nazw Netbird na serwerze.",
         "caution": "Zachowaj ostrożność i upewnij się, że rozumiesz konsekwencje tej zmiany przed kontynuacją.",
         "more_info": "Więcej informacji:",
         "tpm": "Włączenie TPM przypisuje klucz węzła Netbird do konkretnego sprzętu tego urządzenia. Jeśli TPM zostanie później wyłączony, klucz węzła Netbird stanie się nieprawidłowy i urządzenie będzie wymagać ponownej autoryzacji w Netbird. Istnieje również możliwość zablokowania TPM, co może zakłócić łączność Netbird i wymagać ponownej autoryzacji."

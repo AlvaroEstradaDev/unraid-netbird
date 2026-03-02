@@ -26,7 +26,6 @@
         "enable_netbird": "启用 Netbird",
         "unraid_listen": "Unraid 服务监听 Netbird IP",
         "ip_forward": "启用 IP 转发",
-        "taildrop": "Taildrop 位置",
         "services": "Netbird 服务",
         "wireguard": "Wireguard 端口",
         "outbound_network": "高级网络选项",
@@ -39,13 +38,11 @@
         "reauthenticate": "重新认证",
         "funnel": "允许 Netbird Funnel",
         "hosts": "将对等端添加到 /etc/hosts 文件中。",
-        "no_logs_no_support": "无日志 无支持",
         "tpm": "允许 TPM 加密节点密钥",
         "context": {
             "tpm": "启用受信任平台模块（TPM）以安全存储 Netbird 节点密钥。这提高了安全性，防止节点密钥被轻易提取，确保只有授权的硬件可以访问。启用此选项需要 TPM 2.0。如果系统没有兼容的 TPM，则此选项无效。",
             "unraid_listen": "将Unraid服务（如SSH、WebGUI、SMB等）配置为Netbird监听地址",
             "ip_forward": "在 sysctl 中将 net.ipv4.ip_forward 和 net.ipv6.conf.all.forwarding 设置为 1。启用后，此更改会立即发生。",
-            "taildrop": "指定传入 Taildrop 文件的路径。",
             "dns": "允许通过 CLI 或 WebGUI 启用 Netbird DNS。如果禁用，当 Netbird 启动时，Netbird DNS 也将被禁用。",
             "subnets": "允许通过 CLI 或 WebGUI 启用 Netbird 路由。如果禁用，当 Netbird 启动时，Netbird 路由也将被禁用。",
             "wireguard": "更改用于 Wireguard 连接的端口。这项通常不需要更改。",
@@ -55,8 +52,7 @@
             "save": "应用更改时，Netbird 将重新启动",
             "reauthenticate": "强制进行 Netbird 重新认证。",
             "funnel": "允许通过 WebGUI 启用 Netbird Funnel。如果禁用，Netbird Funnel 将被禁用。",
-            "hosts": "将 Netbird 对等端添加到 /etc/hosts 用于名称解析。如果您希望在不启用服务器上的 Netbird DNS 的情况下使用 Tailnet DNS 名称，这将非常有用。",
-            "no_logs_no_support": "将禁用 Netbird 的遥测功能，并使您无法获得需要此类遥测用于调试的 Netbird 支持。"
+            "hosts": "将 Netbird 对等端添加到 /etc/hosts 用于名称解析。如果您希望在不启用服务器上的 Netbird DNS 的情况下使用 Network DNS 名称，这将非常有用。"
         }
     },
     "info": {
@@ -81,7 +77,7 @@
         "not_ready": "Netbird 尚未准备就绪。",
         "funnel": "为 Unraid WebGUI 启用 Netbird Funnel 会使您的服务器暴露在 Internet 上，极大增加未经授权访问和潜在攻击的风险。只有在您充分理解安全影响的情况下才应启用此功能。建议和安全的远程访问方式是，在您计划用于访问 WebGUI 的设备上安装 Netbird，而不是启用 Funnel。",
         "subnet": "在您的 Unraid 服务器上接受 Netbird 子网会在某些网络配置下破坏本地网络连接。作为子网路由器或出口节点，您的 Unraid 服务器并不需要接受路由。只有当您的 Unraid 服务器需要连接其他设备所发布的远程子网时，才应启用该选项。",
-        "dns": "在服务器上启用 Netbird MagicDNS 可能会干扰 Docker 容器中的名称解析，可能导致应用程序连通性问题。您无需在服务器上启用 MagicDNS，也能从其他设备使用 MagicDNS 名称（如 'unraid.tailnet.ts.net'）访问您的 Unraid 服务器。启用“将对等端添加到 /etc/hosts”是一种更安全的替代方案，可以让服务器上使用 Netbird 名称。",
+        "dns": "在服务器上启用 Netbird Netbird DNS 可能会干扰 Docker 容器中的名称解析，可能导致应用程序连通性问题。您无需在服务器上启用 Netbird DNS，也能从其他设备使用 Netbird DNS 名称（如 'unraid.network.ts.net'）访问您的 Unraid 服务器。启用“将对等端添加到 /etc/hosts”是一种更安全的替代方案，可以让服务器上使用 Netbird 名称。",
         "caution": "请谨慎操作，并确保在继续前已了解此更改的影响。",
         "more_info": "详细信息：",
         "tpm": "启用 TPM 会将 Netbird 节点密钥锁定到此设备的特定硬件。如果之后禁用 TPM，Netbird 节点密钥将失效，设备需要重新通过 Netbird 进行身份验证。TPM 也可能会发生锁定，从而中断 Netbird 连接，并要求重新进行身份验证。"

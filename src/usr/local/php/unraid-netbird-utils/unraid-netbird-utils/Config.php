@@ -22,7 +22,6 @@ namespace Netbird;
 class Config
 {
     public bool $IncludeInterface;
-    public bool $Usage;
     public bool $IPForward;
     public bool $Enable;
     public bool $SSH;
@@ -30,11 +29,9 @@ class Config
     public bool $AllowRoutes;
     public bool $AllowFunnel;
     public bool $AddPeersToHosts;
-    public bool $NoLogsNoSupport;
     public bool $UseTPM;
 
     public int $WgPort;
-    public string $TaildropDir;
     public string $ManagementUrl;
     public string $SetupKey;
 
@@ -50,7 +47,6 @@ class Config
         }
 
         $this->IncludeInterface = boolval($saved_config["INCLUDE_INTERFACE"] ?? "1");
-        $this->Usage            = boolval($saved_config["USAGE"] ?? "1");
         $this->IPForward        = boolval($saved_config["SYSCTL_IP_FORWARD"] ?? "1");
         $this->Enable           = boolval($saved_config["ENABLE_NETBIRD"] ?? "1");
         $this->SSH              = boolval($saved_config["SSH"] ?? "0");
@@ -58,12 +54,9 @@ class Config
         $this->AllowRoutes      = boolval($saved_config["ACCEPT_ROUTES"] ?? "0");
         $this->AllowFunnel      = boolval($saved_config["ALLOW_FUNNEL"] ?? "0");
         $this->AddPeersToHosts  = boolval($saved_config["ADD_PEERS_TO_HOSTS"] ?? "0");
-        $this->NoLogsNoSupport  = boolval($saved_config["NO_LOGS_NO_SUPPORT"] ?? "0");
         $this->UseTPM           = boolval($saved_config["USE_TPM"] ?? "0");
 
         $this->WgPort = intval($saved_config["WG_PORT"] ?? "0");
-
-        $this->TaildropDir = $saved_config["TAILDROP_DIR"] ?? "";
 
         $this->ManagementUrl = $saved_config["MANAGEMENT_URL"] ?? "";
         $this->SetupKey      = $saved_config["SETUP_KEY"]      ?? "";

@@ -26,7 +26,6 @@
         "enable_netbird": "Aktiver Netbird",
         "unraid_listen": "Unraid-tjenester lytter på Netbird-IP",
         "ip_forward": "Aktiver IP-videresending",
-        "taildrop": "Taildrop-plassering",
         "services": "Netbird-tjenester",
         "wireguard": "Wireguard-port",
         "outbound_network": "Avanserte nettverksalternativer",
@@ -39,13 +38,11 @@
         "reauthenticate": "Reautentiser",
         "funnel": "Tillat Netbird Funnel",
         "hosts": "Legg til Peers i /etc/hosts",
-        "no_logs_no_support": "Ingen logger, ingen støtte",
         "tpm": "Tillat TPM å kryptere node-nøkkel",
         "context": {
             "tpm": "Aktiverer bruk av TPM (Trusted Platform Module) for sikker lagring av Netbird-node-nøkkelen. Dette forbedrer sikkerheten ved å beskytte node-nøkkelen mot enkel utvinning, og sikrer at kun autorisert maskinvare kan få tilgang. Aktivering av dette alternativet krever TPM 2.0. Det har ingen effekt dersom systemet ikke har en kompatibel TPM.",
             "unraid_listen": "Konfigurerer Unraid-tjenester (SSH, WebGUI, SMB, osv.) til å lytte på Netbird-adresser.",
             "ip_forward": "Setter net.ipv4.ip_forward og net.ipv6.conf.all.forwarding til 1 i sysctl. Denne endringen skjer umiddelbart når den aktiveres.",
-            "taildrop": "Angi stien for innkommende Taildrop-filer.",
             "dns": "Tillater at Netbird DNS kan aktiveres via CLI eller WebGUI. Hvis deaktivert, deaktiveres Netbird DNS når Netbird starter.",
             "subnets": "Tillater at Netbird-ruter kan aktiveres via CLI eller WebGUI. Hvis deaktivert, deaktiveres Netbird-ruter når Netbird starter.",
             "wireguard": "Endre porten som brukes for Wireguard-tilkoblinger. Dette trenger vanligvis ikke endres.",
@@ -55,8 +52,7 @@
             "save": "Netbird vil bli startet på nytt når endringer brukes",
             "reauthenticate": "Tving en Netbird-reauthentisering.",
             "funnel": "Tillater at Netbird Funnel kan aktiveres via WebGUI. Hvis deaktivert, vil Netbird Funnel være deaktivert.",
-            "hosts": "Legger til Netbird-peers i /etc/hosts for navneoppløsning. Dette er nyttig hvis du vil kunne bruke Tailnet DNS-navn uten de potensielle komplikasjonene ved å aktivere Netbird DNS på serveren.",
-            "no_logs_no_support": "Deaktiverer Netbird sin telemetri og gjør at du ikke kan få støtte fra Netbird som krever slik telemetri for feilsøking."
+            "hosts": "Legger til Netbird-peers i /etc/hosts for navneoppløsning. Dette er nyttig hvis du vil kunne bruke Network DNS-navn uten de potensielle komplikasjonene ved å aktivere Netbird DNS på serveren."
         }
     },
     "info": {
@@ -81,7 +77,7 @@
         "not_ready": "Netbird er ikke klar ennå.",
         "funnel": "Hvis du aktiverer Netbird Funnel for Unraid WebGUI, eksponeres serveren din mot internett, noe som øker risikoen for uautorisert tilgang og potensielle angrep betydelig. Denne funksjonen bør kun aktiveres hvis du fullt ut forstår sikkerhetskonsekvensene. Den anbefalte/sikre metoden for ekstern tilgang er å installere Netbird på enhetene du bruker til å få tilgang til WebGUI i stedet for å aktivere Funnel.",
         "subnet": "Å godta Netbird-subnett på Unraid-serveren din kan forstyrre lokal nettverkstilkobling i visse nettverkskonfigurasjoner. Å godta ruter er ikke nødvendig for at Unraid-serveren din skal fungere som en subnettruter eller exit node. Aktiver kun dette alternativet hvis Unraid-serveren din må koble til eksterne subnett annonsert av andre enheter.",
-        "dns": "Å aktivere Netbird MagicDNS på serveren din kan forstyrre navneoppløsning inne i Docker-containere, noe som potensielt kan føre til tilkoblingsproblemer for applikasjoner. MagicDNS trenger ikke å være aktivert på serveren for at du skal kunne få tilgang til Unraid-serveren ved å bruke MagicDNS-navn (for eksempel \"unraid.tailnet.ts.net\") fra andre enheter. Å aktivere «Legg til Peers i /etc/hosts» er et tryggere alternativ som lar deg bruke Netbird-navn på serveren.",
+        "dns": "Å aktivere Netbird DNS på serveren din kan forstyrre navneoppløsning inne i Docker-containere, noe som potensielt kan føre til tilkoblingsproblemer for applikasjoner. Netbird DNS trenger ikke å være aktivert på serveren for at du skal kunne få tilgang til Unraid-serveren ved å bruke Netbird DNS-navn (for eksempel \"unraid.network.ts.net\") fra andre enheter. Å aktivere «Legg til Peers i /etc/hosts» er et tryggere alternativ som lar deg bruke Netbird-navn på serveren.",
         "caution": "Fortsett med forsiktighet og sørg for at du forstår konsekvensene av denne endringen før du går videre.",
         "more_info": "For mer informasjon:",
         "tpm": "Når TPM aktiveres, låses Netbird-node-nøkkelen til maskinvaren på denne enheten. Hvis TPM senere deaktiveres, vil Netbird-node-nøkkelen bli ugyldig, og enheten må autentiseres på nytt med Netbird. Det er også mulig at TPM kan låses ute, noe som kan forstyrre Netbird-tilkoblingen og kreve ny autentisering."
