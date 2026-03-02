@@ -185,16 +185,6 @@ class Utils extends \EDACerton\PluginUtils\Utils
 
         if ( ! $localAPI->isReady()) {
             echo($tr->tr("warnings.not_ready"));
-            echo(<<<EOT
-                <script>
-                    $(function() {
-                        setTimeout(function() {
-                            window.location = window.location.href;
-                        }, 5000);
-                    });
-                </script>
-                EOT
-            );
             return false;
         }
 
