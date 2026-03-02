@@ -319,12 +319,12 @@ if ($netbirdConfig->Enable) {
 <script src="<?= Utils::auto_v('/webGui/javascript/jquery.filetree.js'); ?>"></script>
 <script src="<?= Utils::auto_v('/webGui/javascript/jquery.switchbutton.js'); ?>"></script>
 <script>
-    $(function ()
-    {
-        if (typeof timers !== 'undefined' && timers.refresh) {
+    if (typeof timers !== 'undefined') {
+        if (timers.refresh) {
             clearTimeout(timers.refresh);
         }
-    });
+        timers.refresh = null;
+    }
     
     function requestErase(e)
     {
