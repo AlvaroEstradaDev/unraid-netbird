@@ -46,7 +46,7 @@ class LocalAPI
     {
         try {
             $status = $this->getStatus();
-            if (isset($status->management->connected) && $status->management->connected) {
+            if (isset($status->Self->Online) && $status->Self->Online) {
                 return true;
             }
         } catch (\RuntimeException $e) {
