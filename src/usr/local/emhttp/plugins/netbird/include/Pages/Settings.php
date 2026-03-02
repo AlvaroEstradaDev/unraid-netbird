@@ -319,12 +319,31 @@ if ($netbirdConfig->Enable) {
 <script src="<?= Utils::auto_v('/webGui/javascript/jquery.filetree.js'); ?>"></script>
 <script src="<?= Utils::auto_v('/webGui/javascript/jquery.switchbutton.js'); ?>"></script>
 <script>
-    if (typeof timers !== 'undefined') {
-        if (timers.refresh) {
-            clearTimeout(timers.refresh);
-        }
-        timers.refresh = null;
-    }
+    // Prevent auto-refresh on Settings page
+    (function() {
+        var clearTimer = function() {
+            if (typeof timers !== 'undefined') {
+                if (timers.refresh) {
+                    clearTimeout(timers.refresh);
+                    timers.refresh = null;
+                }
+            }
+        };
+        
+        // Clear immediately
+        clearTimer();
+        
+        // Clear after a short delay (in case timer is set after page load)
+        setTimeout(clearTimer, 100);
+        setTimeout(clearTimer, 500);
+        setTimeout(clearTimer, 1000);
+        
+        // Continuously clear for the first 10 seconds
+        var interval = setInterval(clearTimer, 500);
+        setTimeout(function() {
+            clearInterval(interval);
+        }, 10000);
+    })();
     
     function requestErase(e)
     {
