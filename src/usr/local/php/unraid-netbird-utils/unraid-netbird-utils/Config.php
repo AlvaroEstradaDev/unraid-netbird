@@ -35,6 +35,8 @@ class Config
 
     public int $WgPort;
     public string $TaildropDir;
+    public string $ManagementUrl;
+    public string $SetupKey;
 
     public function __construct()
     {
@@ -62,5 +64,8 @@ class Config
         $this->WgPort = intval($saved_config["WG_PORT"] ?? "0");
 
         $this->TaildropDir = $saved_config["TAILDROP_DIR"] ?? "";
+
+        $this->ManagementUrl = $saved_config["MANAGEMENT_URL"] ?? "";
+        $this->SetupKey      = $saved_config["SETUP_KEY"]      ?? "";
     }
 }

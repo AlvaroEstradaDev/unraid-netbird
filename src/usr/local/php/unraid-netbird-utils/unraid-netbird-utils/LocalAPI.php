@@ -144,4 +144,24 @@ class LocalAPI
             Utils::logwrap("Failed to post login interactive: " . $e->getMessage());
         }
     }
+
+    public function loginWithSetupKey(string $managementUrl, string $setupKey): bool
+    {
+        try {
+            if (file_exists('/tmp/netbird-login.log')) {
+                unlink('/tmp/netbird-login.log');
+            }
+
+            $escapedUrl      = escapeshellarg($managementUrl);
+            $escapedSetupKey = escapeshellarg($setupKey);
+
+            $command = "nohup netbird up --management-url {$escapedUrl} --setup-key {$escapedSetupKey} > /tmp/netbird-login.log 2>&1 &";
+            Utils::runwrap($command, false, false);
+
+            return true;
+        } catch (\RuntimeException $e) {
+            Utils::logwrap("Failed to login with setup key: " . $e->getMessage());
+            return false;
+        }
+    }
 }

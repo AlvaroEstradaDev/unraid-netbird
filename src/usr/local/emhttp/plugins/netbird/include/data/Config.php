@@ -131,23 +131,33 @@ try {
             echo json_encode($rtn);
             break;
         case 'up':
-            $utils->logmsg("Getting Auth URL");
-            $authURL = $netbirdInfo->getAuthURL();
-            if ($authURL == "") {
+            $managementUrl = $_POST['management_url'] ?? $netbirdConfig->ManagementUrl;
+            $setupKey      = $_POST['setup_key']      ?? $netbirdConfig->SetupKey;
+
+            if ( ! empty($managementUrl) && ! empty($setupKey)) {
+                $utils->logmsg("Logging in with setup key");
                 $localAPI = new LocalAPI();
-                $localAPI->postLoginInteractive();
-                $retries = 0;
-                while ($retries < 60) {
-                    $netbirdInfo = new Info($tr);
-                    $authURL     = $netbirdInfo->getAuthURL();
-                    if ($authURL != "") {
-                        break;
+                $result   = $localAPI->loginWithSetupKey($managementUrl, $setupKey);
+                echo $result ? "setup_key_success" : "setup_key_failed";
+            } else {
+                $utils->logmsg("Getting Auth URL");
+                $authURL = $netbirdInfo->getAuthURL();
+                if ($authURL == "") {
+                    $localAPI = new LocalAPI();
+                    $localAPI->postLoginInteractive();
+                    $retries = 0;
+                    while ($retries < 60) {
+                        $netbirdInfo = new Info($tr);
+                        $authURL     = $netbirdInfo->getAuthURL();
+                        if ($authURL != "") {
+                            break;
+                        }
+                        usleep(500000);
+                        $retries++;
                     }
-                    usleep(500000);
-                    $retries++;
                 }
+                echo $authURL;
             }
-            echo $authURL;
             break;
     }
 } catch (\Throwable $e) {
