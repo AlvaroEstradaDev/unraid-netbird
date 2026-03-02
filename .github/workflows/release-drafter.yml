@@ -3,7 +3,7 @@ name: Release Drafter
 on:
   push:
     branches:
-      - trunk
+      - main
 
 permissions:
   contents: read
@@ -20,7 +20,7 @@ jobs:
         id: set_version
         run: TZ=UTC date +'%Y.%m.%d.%H%M' | xargs -I{} echo "version={}" >> $GITHUB_ENV
 
-      - uses: AlvaroEstradaDev/release-drafter@8bc802e5816eff4cc92ae7ce2a6f5f09c284bf0d
+      - uses: release-drafter/release-drafter@v6
         with:
           version: ${{ env.version }}
           name: ${{ env.version }}
