@@ -4,10 +4,10 @@
 <PLUGIN 
   name="netbird"
   author="Alvaro Estrada"
-  version="2026.02.16.0429"
+  version="2026.03.02.2112"
   launch="Settings/Netbird"
   pluginURL="https://raw.githubusercontent.com/AlvaroEstradaDev/unraid-netbird/preview/plugin/netbird-preview.plg"
-  support="https://forums.unraid.net/topic/136889-plugin-netbird/"
+  support="https://forums.unraid.net/topic/"
   min="7.0.0"
   
   
@@ -16,28 +16,13 @@
 <CHANGES>
 <![CDATA[
 
-### 2026.02.16.0429
+### 2026.03.02.2112
 
-### 🚀 Features
+### 🐛 Bug Fixes
 
-- Better handing of serve configuration ([#100](https://github.com/AlvaroEstradaDev/unraid-netbird/pull/100))
-
-### 🧰 Maintenance
-
-- Update Netbird to 1.94.2 ([#99](https://github.com/AlvaroEstradaDev/unraid-netbird/pull/99))
-
-### 2026.01.27.2240
-
-### 🧰 Maintenance
-
-- Update Netbird to 1.94.1 ([#97](https://github.com/AlvaroEstradaDev/unraid-netbird/pull/97))
-- Update composer, add php version ([#96](https://github.com/AlvaroEstradaDev/unraid-netbird/pull/96)) 
-
-### 2026.01.08.0308
-
-### 🧰 Maintenance
-
-- Update Netbird to 1.92.5 ([#94](https://github.com/AlvaroEstradaDev/unraid-netbird/pull/94)) 
+- fix: update workflows to use main branch and restore release drafter ([#3](https://github.com/AlvaroEstradaDev/unraid-netbird/pull/3))
+- fix: correct netbird package urls and extraction params ([#2](https://github.com/AlvaroEstradaDev/unraid-netbird/pull/2))
+- fix: correct github release urls ([#1](https://github.com/AlvaroEstradaDev/unraid-netbird/pull/1))
 
 
 For older releases, see https://github.com/AlvaroEstradaDev/unraid-netbird/releases
@@ -81,9 +66,9 @@ if ($oldPlugin !== "") {
 <SHA256>10196c855c4ebd849e54325dde3b8727bc91c070b75a7abf9325326c0a7c72f6</SHA256>
 </FILE>
 
-<FILE Name="/boot/config/plugins/netbird/unraid-netbird-utils-2026.02.16.0429-noarch-1.txz">
-<URL>https://github.com/AlvaroEstradaDev/unraid-netbird/releases/download/2026.02.16.0429/unraid-netbird-utils-2026.02.16.0429-noarch-1.txz</URL>
-<SHA256>0055ca26dd7dae771249cfe3462999edbd9b14b3a554ef02a777808a6e0fd0d2</SHA256>
+<FILE Name="/boot/config/plugins/netbird/unraid-netbird-utils-2026.03.02.2112-noarch-1.txz">
+<URL>https://github.com/AlvaroEstradaDev/unraid-netbird/releases/download/2026.03.02.2112/unraid-netbird-utils-2026.03.02.2112-noarch-1.txz</URL>
+<SHA256>8445555d098eac8656f464e98f4419f1c077a1650de682dddeaba5daedb5dccb</SHA256>
 </FILE>
 
 <!--
@@ -101,14 +86,13 @@ if [ -L "/etc/rc.d/rc.netbird" ]; then
     rm -f /etc/rc.d/rc.netbird
 fi
 
-upgradepkg --install-new /boot/config/plugins/netbird/unraid-netbird-utils-2026.02.16.0429-noarch-1.txz
+upgradepkg --install-new /boot/config/plugins/netbird/unraid-netbird-utils-2026.03.02.2112-noarch-1.txz
 
 mkdir -p /usr/local/emhttp/plugins/netbird/bin
 tar xzf /boot/config/plugins/netbird/0.66.0.tar.gz -C /usr/local/emhttp/plugins/netbird/bin netbird
 
 echo "state" > /boot/config/plugins/netbird/.gitignore
 
-ln -s /usr/local/emhttp/plugins/netbird/bin/netbird /usr/local/sbin/netbird
 ln -s /usr/local/emhttp/plugins/netbird/bin/netbird /usr/local/sbin/netbird
 
 # remove other branches (e.g., if switching from main to preview)
@@ -129,7 +113,7 @@ sed -i "s/Netbird\*\*/Netbird (Preview)**/" /usr/local/emhttp/plugins/netbird/RE
 netbird completion bash > /etc/bash_completion.d/netbird
 
 # cleanup old versions
-rm -f $(ls /boot/config/plugins/netbird/unraid-netbird-utils-*.txz 2>/dev/null | grep -v '2026.02.16.0429')
+rm -f $(ls /boot/config/plugins/netbird/unraid-netbird-utils-*.txz 2>/dev/null | grep -v '2026.03.02.2112')
 rm -f $(ls /boot/config/plugins/netbird/*.tar.gz 2>/dev/null | grep -v '0.66.0')
 
 # check to see if the state file has been backed up to Unraid Connect
@@ -153,7 +137,7 @@ fi
 echo ""
 echo "----------------------------------------------------"
 echo " netbird has been installed."
-echo " Version: 2026.02.16.0429"
+echo " Version: 2026.03.02.2112"
 echo "----------------------------------------------------"
 echo ""
 ]]>
@@ -169,8 +153,7 @@ The 'remove' script.
 # Stop service
 /etc/rc.d/rc.netbird stop 2>/dev/null
 
-rm /usr/local/sbin/netbird
-rm /usr/local/sbin/netbird
+rm -f /usr/local/sbin/netbird
 
 removepkg unraid-netbird-utils
 
