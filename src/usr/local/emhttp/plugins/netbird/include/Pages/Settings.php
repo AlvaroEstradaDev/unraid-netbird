@@ -58,12 +58,37 @@ if ($netbirdConfig->Enable) {
     <table class="unraid tablesorter">
         <thead>
             <tr>
-                <td><?= $tr->tr("settings.system_settings"); ?></td>
+                <td><?= $tr->tr("settings.server_connection"); ?></td>
             </tr>
         </thead>
     </table>
 
+    <dl>
+        <dt><?= $tr->tr("settings.management_url"); ?></dt>
+        <dd>
+            <input type="text" name="MANAGEMENT_URL" class="narrow" autocomplete="off" spellcheck="false"
+                value="<?= htmlspecialchars($netbirdConfig->ManagementUrl); ?>" placeholder="https://api.netbird.io:443">
+        </dd>
+    </dl>
+    <blockquote class='inline_help'><?= $tr->tr("settings.context.management_url"); ?></blockquote>
+
+    <dl>
+        <dt><?= $tr->tr("settings.setup_key"); ?></dt>
+        <dd>
+            <input type="password" name="SETUP_KEY" class="narrow" autocomplete="new-password"
+                value="<?= htmlspecialchars($netbirdConfig->SetupKey); ?>">
+        </dd>
+    </dl>
+    <blockquote class='inline_help'><?= $tr->tr("settings.context.setup_key"); ?></blockquote>
+
     <div class="advanced">
+        <table class="unraid tablesorter">
+            <thead>
+                <tr>
+                    <td><?= $tr->tr("settings.system_settings"); ?></td>
+                </tr>
+            </thead>
+        </table>
         <dl>
             <dt><?= $tr->tr("settings.enable_netbird"); ?></dt>
             <dd>
@@ -404,6 +429,49 @@ if ($netbirdConfig->Enable) {
                 }
             }
         );
+    }
+
+    function netbirdUp()
+    {
+        var managementUrl = $('input[name="MANAGEMENT_URL"]').val() || '';
+        var setupKey = $('input[name="SETUP_KEY"]').val() || '';
+
+        $.post('/plugins/netbird/include/data/Config.php', { action: 'up', management_url: managementUrl, setup_key: setupKey }, function (data)
+        {
+            if (data === 'setup_key_success')
+            {
+                swal({
+                    title: "<?= $tr->tr('settings.login_success'); ?>",
+                    text: "<?= $tr->tr('settings.context.login_success'); ?>",
+                    type: "success",
+                    confirmButtonText: "<?= $tr->tr('accept'); ?>"
+                }, function() {
+                    location.reload();
+                });
+            }
+            else if (data === 'setup_key_failed')
+            {
+                swal({
+                    title: "<?= $tr->tr('settings.login_failed'); ?>",
+                    text: "<?= $tr->tr('settings.context.login_failed'); ?>",
+                    type: "error",
+                    confirmButtonText: "<?= $tr->tr('accept'); ?>"
+                });
+            }
+            else if (data && data !== '')
+            {
+                $('#netbirdUpLink').html('<a href="' + data + '" target="_blank"><?= $tr->tr("login"); ?></a>');
+            }
+            else
+            {
+                swal({
+                    title: "<?= $tr->tr('settings.login_failed'); ?>",
+                    text: "<?= $tr->tr('settings.context.login_failed'); ?>",
+                    type: "error",
+                    confirmButtonText: "<?= $tr->tr('accept'); ?>"
+                });
+            }
+        });
     }
 
 </script>
