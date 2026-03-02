@@ -16,7 +16,7 @@ jobs:
       - uses: dkaser/unraid-plugin-release-action@v1
         id: release_action
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          github_token: ${{ secrets.GIT_TOKEN }}
           plg_branch: main
           build_prereleases: true
           ssh_key: ${{ secrets.DEPLOY_KEY }}
