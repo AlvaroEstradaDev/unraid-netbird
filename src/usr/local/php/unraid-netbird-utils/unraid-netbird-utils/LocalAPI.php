@@ -108,6 +108,9 @@ class LocalAPI
 
 
 
+    /**
+     * @return array<string, bool>
+     */
     public function getRoutes(): array
     {
         try {
