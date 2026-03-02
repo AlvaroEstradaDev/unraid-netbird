@@ -1,0 +1,53 @@
+#!/bin/sh
+# /etc/rc.d/rc.netbird - start/stop the netbird daemon
+
+. /usr/local/php/unraid-netbird-utils/log.sh
+
+start_netbird() {
+  if ! /usr/bin/pgrep --ns $$ --euid root -f "^/usr/local/sbin/netbird" 1> /dev/null 2> /dev/null ; then
+
+    /usr/local/php/unraid-netbird-utils/pre-startup.php
+    if [ $? -ne 0 ]; then
+        log "Netbird is disabled in settings, not starting netbird."
+        return
+    fi
+
+    if [ -f /usr/local/emhttp/plugins/netbird/custom-params.sh ]; then
+        . /usr/local/emhttp/plugins/netbird/custom-params.sh
+    else
+        NETBIRD_CUSTOM_PARAMS=""
+    fi
+
+    NETBIRD_START_CMD="/usr/local/sbin/netbird service run -c /boot/config/plugins/netbird/config.json $NETBIRD_CUSTOM_PARAMS"
+    log "Starting netbird: $NETBIRD_START_CMD"
+    mkdir -p /boot/config/plugins/netbird
+    $NETBIRD_START_CMD 2>&1 >> /var/log/netbird.log &
+    nohup /usr/local/emhttp/plugins/netbird/netbird-watcher.php 1>/dev/null 2>&1 &
+  fi
+}
+
+stop_netbird() {
+  log "Stopping netbird."
+  killall --ns $$ --wait netbird-watcher.php 2> /dev/null
+  killall --ns $$ --wait netbird 2> /dev/null
+}
+
+restart_netbird() {
+  stop_netbird
+  sleep 1
+  start_netbird
+}
+
+case "$1" in
+'start')
+  start_netbird
+  ;;
+'stop')
+  stop_netbird
+  ;;
+'restart')
+  restart_netbird
+  ;;
+*)
+  echo "usage $0 start|stop|restart"
+esac

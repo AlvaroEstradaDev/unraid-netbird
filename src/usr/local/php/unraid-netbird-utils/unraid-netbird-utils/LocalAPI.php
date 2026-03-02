@@ -1,0 +1,206 @@
+<?php
+
+/*
+    Copyright (C) 2026  Alvaro Estrada
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+*/
+
+namespace Netbird;
+
+enum APIMethods
+{
+    case GET;
+    case POST;
+    case PATCH;
+}
+
+class LocalAPI
+{
+    private const netbirdSocket = '/var/run/netbird/netbird.sock';
+    private Utils $utils;
+
+    public function __construct()
+    {
+        if (!defined(__NAMESPACE__ . "\PLUGIN_ROOT") || !defined(__NAMESPACE__ . "\PLUGIN_NAME")) {
+            throw new \RuntimeException("Common file not loaded.");
+        }
+        $this->utils = new Utils(PLUGIN_NAME);
+    }
+
+    private function netbirdLocalAPI(string $url, APIMethods $method = APIMethods::GET, object $body = new \stdClass()): string
+    {
+        if (empty($url)) {
+            throw new \InvalidArgumentException("URL cannot be empty");
+        }
+
+        $body_encoded = json_encode($body, JSON_UNESCAPED_SLASHES);
+
+        if (!$body_encoded) {
+            throw new \InvalidArgumentException("Failed to encode JSON");
+        }
+
+        $ch = curl_init();
+
+        $headers = [];
+
+        curl_setopt($ch, CURLOPT_TIMEOUT, 5);
+        curl_setopt($ch, CURLOPT_UNIX_SOCKET_PATH, $this::netbirdSocket);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_URL, "http://local-netbird.sock/localapi/{$url}");
+
+        if ($method == APIMethods::POST) {
+            curl_setopt($ch, CURLOPT_POST, true);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $body_encoded);
+            $this->utils->logmsg("Netbird Local API: {$url} POST " . $body_encoded);
+            $headers[] = "Content-Type: application/json";
+        }
+
+        if ($method == APIMethods::PATCH) {
+            curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'PATCH');
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $body_encoded);
+            $this->utils->logmsg("Netbird Local API: {$url} PATCH " . $body_encoded);
+            $headers[] = "Content-Type: application/json";
+        }
+
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+
+        $out = curl_exec($ch);
+        $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+
+        if ($out === false) {
+            throw new \RuntimeException("Netbird Local API request failed for URL: {$url}");
+        }
+
+        if ($http_code < 200 || $http_code >= 300) {
+            throw new \RuntimeException("Netbird Local API returned HTTP {$http_code} for URL: {$url}");
+        }
+
+        return strval($out);
+    }
+
+    private function decodeJSONResponse(string $response): \stdClass
+    {
+        $decoded = json_decode($response);
+
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            throw new \RuntimeException("Failed to decode JSON response: " . json_last_error_msg());
+        }
+
+        return (object) $decoded;
+    }
+
+    public function isReady(): bool
+    {
+        try {
+            $status = $this->getStatus();
+            if (isset($status->management->connected) && $status->management->connected) {
+                return true;
+            }
+        } catch (\RuntimeException $e) {
+            // No need to log here, as this is just a readiness check
+        }
+        return false;
+    }
+
+    public function getStatus(): \stdClass
+    {
+        try {
+            $output = Utils::runwrap('netbird status --json 2>/dev/null', false, false);
+            $raw = $this->decodeJSONResponse(implode("\n", $output));
+
+            // Map Netbird JSON to expected format
+            $mapped = new \stdClass();
+            $mapped->Version = $raw->daemonVersion ?? '';
+            $mapped->Self = new \stdClass();
+            $mapped->Self->Online = $raw->management->connected ?? false;
+            $mapped->Self->HostName = explode('.', $raw->fqdn ?? '')[0] ?? '';
+            $mapped->Self->DNSName = $raw->fqdn ?? '';
+            $ips = [];
+            if (isset($raw->netbirdIp)) {
+                $ips[] = explode('/', $raw->netbirdIp)[0];
+            }
+            $mapped->NetbirdIPs = $ips;
+            $mapped->Self->NetbirdIPs = $ips;
+
+            $mapped->Peer = new \stdClass();
+            if (isset($raw->peers->details)) {
+                foreach ($raw->peers->details as $peer) {
+                    $p = new \stdClass();
+                    $p->DNSName = $peer->fqdn;
+                    $p->NetbirdIPs = [$peer->netbirdIp];
+                    $p->Online = $peer->status === "Connected";
+                    $p->Active = $peer->status === "Connected";
+                    $p->Relay = isset($peer->relayAddress) && $peer->connectionType === "Relayed" ? $peer->relayAddress : "";
+                    $p->CurAddr = $peer->iceCandidateEndpoint->remote ?? "";
+                    $p->TxBytes = $peer->transferSent ?? 0;
+                    $p->RxBytes = $peer->transferReceived ?? 0;
+                    $p->ExitNode = false;
+                    $p->ExitNodeOption = false;
+                    $p->Tags = [];
+
+                    $mapped->Peer->{$peer->publicKey} = $p;
+                }
+            }
+
+            return $mapped;
+        } catch (\RuntimeException $e) {
+            Utils::logwrap("Failed to get status: " . $e->getMessage());
+            return new \stdClass();
+        }
+    }
+
+
+
+    public function getRoutes(): array
+    {
+        try {
+            $output = Utils::runwrap('netbird routes list 2>/dev/null', false, false);
+            $routes = [];
+
+            foreach ($output as $line) {
+                $line = trim($line);
+                if (empty($line) || $line === '-') {
+                    continue;
+                }
+
+                // Match network CIDR patterns (IPv4 or IPv6)
+                if (preg_match('/([\d.]+\/\d+|[\da-f:]+\/\d+)/i', $line, $matches)) {
+                    $network = $matches[1];
+                    $selected = stripos($line, 'Selected') !== false;
+                    $routes[$network] = $selected;
+                }
+            }
+
+            return $routes;
+        } catch (\RuntimeException $e) {
+            return [];
+        }
+    }
+
+    public function postLoginInteractive(): void
+    {
+        try {
+            // Remove previous login log
+            if (file_exists('/tmp/netbird-login.log')) {
+                unlink('/tmp/netbird-login.log');
+            }
+            // Run netbird up in background and capture output
+            Utils::runwrap('nohup netbird up --no-browser > /tmp/netbird-login.log 2>&1 &', false, false);
+        } catch (\RuntimeException $e) {
+            Utils::logwrap("Failed to post login interactive: " . $e->getMessage());
+        }
+    }
+}

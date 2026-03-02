@@ -1,0 +1,18 @@
+Menu="Netbird"
+Icon="netbird.png"
+Title="Settings"
+Type="xmenu"
+Tag="gears"
+Markdown="false"
+---
+<?php
+
+try {
+    $docroot = $docroot ?? $_SERVER['DOCUMENT_ROOT'] ?: '/usr/local/emhttp';
+    require_once "{$docroot}/plugins/netbird/include/page.php";
+    echo Netbird\getPage("Settings", true, array("var" => $var ?? null, "display" => $display ?? null));
+} catch (Throwable $e) {
+    echo "An error occurred: <pre>" . print_r($e, true) . "</pre>";
+}
+
+?>

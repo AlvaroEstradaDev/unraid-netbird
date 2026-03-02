@@ -1,0 +1,8 @@
+{
+    "files": [
+        "/var/log/netbird.log",
+        "/var/log/netbird.log.*",
+        "/var/log/netbird-utils.log",
+        "/var/log/netbird-utils.log.*"
+    ]
+}

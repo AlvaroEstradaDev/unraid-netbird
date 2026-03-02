@@ -1,0 +1,184 @@
+<?xml version='1.0' standalone='yes'?>
+<!DOCTYPE PLUGIN>
+
+<PLUGIN 
+  name="netbird"
+  author="Alvaro Estrada"
+  version="2026.02.16.0429"
+  launch="Settings/Netbird"
+  pluginURL="https://raw.githubusercontent.com/unraid/unraid-netbird/preview/plugin/netbird-preview.plg"
+  support="https://forums.unraid.net/topic/136889-plugin-netbird/"
+  min="7.0.0"
+  
+  
+>
+
+<CHANGES>
+<![CDATA[
+
+### 2026.02.16.0429
+
+### 🚀 Features
+
+- Better handing of serve configuration ([#100](https://github.com/unraid/unraid-netbird/pull/100))
+
+### 🧰 Maintenance
+
+- Update Netbird to 1.94.2 ([#99](https://github.com/unraid/unraid-netbird/pull/99))
+
+### 2026.01.27.2240
+
+### 🧰 Maintenance
+
+- Update Netbird to 1.94.1 ([#97](https://github.com/unraid/unraid-netbird/pull/97))
+- Update composer, add php version ([#96](https://github.com/unraid/unraid-netbird/pull/96)) 
+
+### 2026.01.08.0308
+
+### 🧰 Maintenance
+
+- Update Netbird to 1.92.5 ([#94](https://github.com/unraid/unraid-netbird/pull/94)) 
+
+
+For older releases, see https://github.com/unraid/unraid-netbird/releases
+]]>
+</CHANGES>
+
+<FILE Run="/usr/bin/php">
+<INLINE>
+<![CDATA[
+<?php
+$oldPlugin = "";
+$unraidVersion = parse_ini_file("/etc/unraid-version");
+
+// Skip this check pre-boot, this creates a minor risk that someone could update, then downgrade the OS,
+// but the alternative is that the plugin could fail to downgrade during boot (e.g., if network was not ready).
+if (!file_exists('/var/local/emhttp/var.ini') || !isset($unraidVersion['version'])) {
+    exit(0);
+}
+
+if (version_compare($unraidVersion['version'], '7.1', '<')) {
+    $oldPlugin = "https://raw.githubusercontent.com/unraid/unraid-netbird/refs/tags/unraid-7.0/plugin/netbird-preview.plg";
+}
+
+if ($oldPlugin !== "") {
+    echo "**************************************************\n";
+    echo "* Your current Unraid version is out of date and  \n";
+    echo "* is no longer supported by this plugin.          \n";
+    echo "*                                                 \n";
+    echo "* The last supported version of the plugin for    \n";
+    echo "* your Unraid version will now be installed.      \n";
+    echo "**************************************************\n\n";
+    system("/usr/local/sbin/plugin install $oldPlugin");
+    exit(1);
+}
+]]>
+</INLINE>
+</FILE>
+
+<FILE Name="/boot/config/plugins/netbird/netbird_1.94.2_amd64.tgz">
+<URL>https://pkgs.netbird.com/stable/netbird_1.94.2_amd64.tgz</URL>
+<SHA256>c6f99a5d774c7783b56902188d69e9756fc3dddfb08ac6be4cb2585f3fecdc32</SHA256>
+</FILE>
+
+<FILE Name="/boot/config/plugins/netbird/unraid-netbird-utils-2026.02.16.0429-noarch-1.txz">
+<URL>https://github.com/unraid/unraid-netbird/releases/download/2026.02.16.0429/unraid-netbird-utils-2026.02.16.0429-noarch-1.txz</URL>
+<SHA256>0055ca26dd7dae771249cfe3462999edbd9b14b3a554ef02a777808a6e0fd0d2</SHA256>
+</FILE>
+
+<!--
+The 'install' script.
+-->
+<FILE Run="/bin/bash">
+<INLINE>
+<![CDATA[
+if [ -d "/usr/local/emhttp/plugins/netbird" ]; then
+    rm -rf /usr/local/emhttp/plugins/netbird
+fi
+
+# Remove /etc/rc.d/rc.netbird symlink if it exists from older versions
+if [ -L "/etc/rc.d/rc.netbird" ]; then
+    rm -f /etc/rc.d/rc.netbird
+fi
+
+upgradepkg --install-new /boot/config/plugins/netbird/unraid-netbird-utils-2026.02.16.0429-noarch-1.txz
+
+mkdir -p /usr/local/emhttp/plugins/netbird/bin
+tar xzf /boot/config/plugins/netbird/netbird_1.94.2_amd64.tgz --strip-components 1 -C /usr/local/emhttp/plugins/netbird/bin
+
+echo "state" > /boot/config/plugins/netbird/.gitignore
+
+ln -s /usr/local/emhttp/plugins/netbird/bin/netbird /usr/local/sbin/netbird
+ln -s /usr/local/emhttp/plugins/netbird/bin/netbird /usr/local/sbin/netbird
+
+# remove other branches (e.g., if switching from main to preview)
+rm -f /boot/config/plugins/netbird.plg
+rm -f /var/log/plugins/netbird.plg
+rm -f /boot/config/plugins/netbird-trunk.plg
+rm -f /var/log/plugins/netbird-trunk.plg
+
+
+# Update plugin name for non-main branches
+sed -i "s/Netbird\*\*/Netbird (Preview)**/" /usr/local/emhttp/plugins/netbird/README.md
+
+
+# start netbird
+/usr/local/emhttp/plugins/netbird/restart.sh
+
+# Bash completion
+netbird completion bash > /etc/bash_completion.d/netbird
+
+# cleanup old versions
+rm -f $(ls /boot/config/plugins/netbird/unraid-netbird-utils-*.txz 2>/dev/null | grep -v '2026.02.16.0429')
+rm -f $(ls /boot/config/plugins/netbird/*.tgz 2>/dev/null | grep -v 'netbird_1.94.2_amd64')
+
+# check to see if the state file has been backed up to Unraid Connect
+if [ -d "/boot/.git" ]; then
+        if git --git-dir /boot/.git log --all --name-only --diff-filter=A -- config/plugins/netbird/state/netbird.state | grep -q . ; then
+            echo "******************************"
+            echo "*          WARNING           *"
+            echo "******************************"
+            echo " "
+            echo "The Netbird state file has been backed up to Unraid Connect via Flash backup." 
+            echo " "
+            echo "To remove this backup, please perform the following steps:"
+            echo "1. Go to Settings -> Management Access".
+            echo "2. Under Unraid Connect, deactivate flash backup. Select the option to also delete cloud backup."
+            echo "3. Reactivate flash backup."
+
+            /usr/local/emhttp/webGui/scripts/notify -l '/Settings/ManagementAccess' -i 'alert' -e 'Netbird State' -s 'Netbird state backed up to Unraid connect.' -d 'The Netbird state file has been backed up to Unraid connect. This is a potential security risk. From the Management Settings page, deactivate flash backup and delete cloud backups, then reactivate flash backup.'
+        fi
+fi
+
+echo ""
+echo "----------------------------------------------------"
+echo " netbird has been installed."
+echo " Version: 2026.02.16.0429"
+echo "----------------------------------------------------"
+echo ""
+]]>
+</INLINE>
+</FILE>
+
+<!--
+The 'remove' script.
+-->
+<FILE Run="/bin/bash" Method="remove">
+<INLINE>
+<![CDATA[
+# Stop service
+/etc/rc.d/rc.netbird stop 2>/dev/null
+
+rm /usr/local/sbin/netbird
+rm /usr/local/sbin/netbird
+
+removepkg unraid-netbird-utils
+
+rm -rf /usr/local/emhttp/plugins/netbird
+rm -f /boot/config/plugins/netbird/*.tgz
+rm -f /boot/config/plugins/netbird/*.txz
+]]>
+</INLINE>
+</FILE>
+
+</PLUGIN>

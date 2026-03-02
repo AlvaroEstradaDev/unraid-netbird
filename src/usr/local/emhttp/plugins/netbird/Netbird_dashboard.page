@@ -1,0 +1,15 @@
+Cond="version_compare(parse_ini_file('/etc/unraid-version')['version'],'6.11.9','>')"
+Menu="Dashboard:0"
+---
+<?php
+
+try {
+    $docroot = $docroot ?? $_SERVER['DOCUMENT_ROOT'] ?: '/usr/local/emhttp';
+    require_once "{$docroot}/plugins/netbird/include/page.php";
+
+    $mytiles['netbird']['column2'] = Netbird\getPage("Dashboard", false);
+} catch (Throwable $e) {
+    $mytiles['netbird']['column2'] = '<tbody title="Netbird"><tr><td>An error occurred loading the Netbird dashboard widget.</td></tr></tbody>';
+}
+
+?>

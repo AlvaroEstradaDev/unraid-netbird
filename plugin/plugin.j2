@@ -1,0 +1,176 @@
+<?xml version='1.0' standalone='yes'?>
+<!DOCTYPE PLUGIN>
+
+{% set pluginDirectory = "/usr/local/emhttp/plugins/netbird" -%}
+{% set configDirectory = "/boot/config/plugins/netbird" -%}
+{% set version = env['PLUGIN_VERSION'] -%}
+{% if env['PLUGIN_RELEASE'] == "-preview" -%}
+{% set branch = "preview" -%}
+{% else -%}
+{% set branch = "main" -%}
+{% endif -%}
+
+<PLUGIN 
+  name="{{ name }}"
+  author="{{ author }}"
+  version="{{ env['PLUGIN_VERSION'] }}"
+  {% if launch is defined %}launch="{{ launch }}"{% endif %}
+  pluginURL="https://raw.githubusercontent.com/{{ env['GITHUB_REPOSITORY'] }}/{{ branch }}/plugin/{{ name }}{{ env['PLUGIN_RELEASE'] }}.plg"
+  {% if support is defined %}support="{{ support }}"{% endif %}
+  {% if min is defined %}min="{{ min }}"{% endif %}
+  {% if max is defined %}max="{{ max }}"{% endif %}
+  {% if icon is defined %}icon="{{ icon }}"{% endif %}
+>
+
+<CHANGES>
+<![CDATA[
+{{ env['PLUGIN_CHANGELOG'] }}
+
+For older releases, see https://github.com/{{ env['GITHUB_REPOSITORY'] }}/releases
+]]>
+</CHANGES>
+
+<FILE Run="/usr/bin/php">
+<INLINE>
+<![CDATA[
+<?php
+$oldPlugin = "";
+$unraidVersion = parse_ini_file("/etc/unraid-version");
+
+// Skip this check pre-boot, this creates a minor risk that someone could update, then downgrade the OS,
+// but the alternative is that the plugin could fail to downgrade during boot (e.g., if network was not ready).
+if (!file_exists('/var/local/emhttp/var.ini') || !isset($unraidVersion['version'])) {
+    exit(0);
+}
+
+if (version_compare($unraidVersion['version'], '7.1', '<')) {
+    $oldPlugin = "https://raw.githubusercontent.com/{{ env['GITHUB_REPOSITORY'] }}/refs/tags/unraid-7.0/plugin/{{ name }}{{ env['PLUGIN_RELEASE'] }}.plg";
+}
+
+if ($oldPlugin !== "") {
+    echo "**************************************************\n";
+    echo "* Your current Unraid version is out of date and  \n";
+    echo "* is no longer supported by this plugin.          \n";
+    echo "*                                                 \n";
+    echo "* The last supported version of the plugin for    \n";
+    echo "* your Unraid version will now be installed.      \n";
+    echo "**************************************************\n\n";
+    system("/usr/local/sbin/plugin install $oldPlugin");
+    exit(1);
+}
+]]>
+</INLINE>
+</FILE>
+
+<FILE Name="/boot/config/plugins/{{ name }}/{{ netbirdVersion }}.tar.gz">
+<URL>https://github.com/netbirdio/netbird/releases/download/v{{ netbirdVersion }}/netbird_{{ netbirdVersion }}_linux_amd64.tar.gz</URL>
+<SHA256>{{ netbirdSHA256 }}</SHA256>
+</FILE>
+
+<FILE Name="/boot/config/plugins/{{ name }}/{{ package_name }}-{{ env['PLUGIN_VERSION'] }}-noarch-1.txz">
+<URL>https://github.com/{{ env['GITHUB_REPOSITORY'] }}/releases/download/{{ env['PLUGIN_VERSION'] }}/{{ package_name }}-{{ env['PLUGIN_VERSION'] }}-noarch-1.txz</URL>
+<SHA256>{{ env['PLUGIN_CHECKSUM'] }}</SHA256>
+</FILE>
+
+<!--
+The 'install' script.
+-->
+<FILE Run="/bin/bash">
+<INLINE>
+<![CDATA[
+if [ -d "{{ pluginDirectory }}" ]; then
+    rm -rf {{ pluginDirectory }}
+fi
+
+# Remove /etc/rc.d/rc.netbird symlink if it exists from older versions
+if [ -L "/etc/rc.d/rc.netbird" ]; then
+    rm -f /etc/rc.d/rc.netbird
+fi
+
+upgradepkg --install-new /boot/config/plugins/{{ name }}/{{ package_name }}-{{ env['PLUGIN_VERSION'] }}-noarch-1.txz
+
+mkdir -p {{ pluginDirectory }}/bin
+tar xzf {{ configDirectory }}/{{ netbirdVersion }}.tar.gz -C {{ pluginDirectory }}/bin netbird
+
+echo "state" > {{ configDirectory }}/.gitignore
+
+ln -s {{ pluginDirectory }}/bin/netbird /usr/local/sbin/netbird
+
+# remove other branches (e.g., if switching from main to preview)
+{% if branch != 'main' -%}
+rm -f /boot/config/plugins/netbird.plg
+rm -f /var/log/plugins/netbird.plg
+{% endif -%}
+{% if branch != 'preview' -%}
+rm -f /boot/config/plugins/netbird-preview.plg
+rm -f /var/log/plugins/netbird-preview.plg
+{% endif -%}
+{% if branch != 'trunk' -%}
+rm -f /boot/config/plugins/netbird-trunk.plg
+rm -f /var/log/plugins/netbird-trunk.plg
+{% endif %}
+
+{% if branch != 'main' -%}
+# Update plugin name for non-main branches
+sed -i "s/Netbird\*\*/Netbird ({{ branch.capitalize() }})**/" {{ pluginDirectory }}/README.md
+{% endif %}
+
+# start netbird
+{{ pluginDirectory }}/restart.sh
+
+# Bash completion
+netbird completion bash > /etc/bash_completion.d/netbird
+
+# cleanup old versions
+rm -f $(ls /boot/config/plugins/{{ name }}/{{ package_name }}-*.txz 2>/dev/null | grep -v '{{ env['PLUGIN_VERSION'] }}')
+rm -f $(ls /boot/config/plugins/{{ name }}/*.tar.gz 2>/dev/null | grep -v '{{ netbirdVersion }}')
+
+# check to see if the state file has been backed up to Unraid Connect
+if [ -d "/boot/.git" ]; then
+        if git --git-dir /boot/.git log --all --name-only --diff-filter=A -- config/plugins/netbird/state/netbird.state | grep -q . ; then
+            echo "******************************"
+            echo "*          WARNING           *"
+            echo "******************************"
+            echo " "
+            echo "The Netbird state file has been backed up to Unraid Connect via Flash backup." 
+            echo " "
+            echo "To remove this backup, please perform the following steps:"
+            echo "1. Go to Settings -> Management Access".
+            echo "2. Under Unraid Connect, deactivate flash backup. Select the option to also delete cloud backup."
+            echo "3. Reactivate flash backup."
+
+            /usr/local/emhttp/webGui/scripts/notify -l '/Settings/ManagementAccess' -i 'alert' -e 'Netbird State' -s 'Netbird state backed up to Unraid connect.' -d 'The Netbird state file has been backed up to Unraid connect. This is a potential security risk. From the Management Settings page, deactivate flash backup and delete cloud backups, then reactivate flash backup.'
+        fi
+fi
+
+echo ""
+echo "----------------------------------------------------"
+echo " {{ name }} has been installed."
+echo " Version: {{ env['PLUGIN_VERSION'] }}"
+echo "----------------------------------------------------"
+echo ""
+]]>
+</INLINE>
+</FILE>
+
+<!--
+The 'remove' script.
+-->
+<FILE Run="/bin/bash" Method="remove">
+<INLINE>
+<![CDATA[
+# Stop service
+/etc/rc.d/rc.netbird stop 2>/dev/null
+
+rm -f /usr/local/sbin/netbird
+
+removepkg unraid-netbird-utils
+
+rm -rf {{ pluginDirectory }}
+rm -f {{ configDirectory }}/*.tar.gz
+rm -f {{ configDirectory }}/*.txz
+]]>
+</INLINE>
+</FILE>
+
+</PLUGIN>

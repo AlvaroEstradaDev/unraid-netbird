@@ -1,0 +1,18 @@
+language: en-US
+early_access: true
+enable_free_tier: true
+reviews:
+  profile: chill
+  poem: false
+  pre_merge_checks:
+    docstrings:
+      mode: off
+  finishing_touches:
+    docstrings:
+      enabled: false
+  tools:
+    phpstan:
+      enabled: false
+issue_enrichment:
+  auto_enrich:
+    enabled: false

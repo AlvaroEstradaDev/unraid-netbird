@@ -1,0 +1,17 @@
+/var/log/netbird.log {
+   compress
+   daily
+   rotate 4
+   notifempty
+   missingok
+   copytruncate
+}
+
+/var/log/netbird-utils.log {
+   compress
+   daily
+   rotate 4
+   notifempty
+   missingok
+   copytruncate
+}

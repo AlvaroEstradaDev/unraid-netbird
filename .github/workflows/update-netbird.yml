@@ -1,0 +1,86 @@
+name: Netbird updater
+
+on:
+  schedule:
+    - cron: "0 6 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  update-netbird:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: trunk
+
+      - name: Determine versions
+        id: compare
+        run: |
+          latest_version="$(curl -fsSL https://api.github.com/repos/netbirdio/netbird/releases/latest | jq -r '.tag_name' | sed 's/^v//')"
+          if [ -z "$latest_version" ] || [ "$latest_version" == "null" ]; then
+            echo "Error: Failed to fetch latest Netbird version" >&2
+            exit 1
+          fi
+          current_version="$(jq -r '.netbirdVersion' plugin/plugin.json)"
+          echo "latest=${latest_version}" >> "$GITHUB_OUTPUT"
+          echo "current=${current_version}" >> "$GITHUB_OUTPUT"
+          if [ "$latest_version" != "$current_version" ]; then
+            echo "update=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "update=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Stop when up to date
+        if: steps.compare.outputs.update != 'true'
+        run: echo "Netbird is already up to date."
+
+      - name: Update plugin metadata
+        if: steps.compare.outputs.update == 'true'
+        id: plugin
+        run: |
+          new_version="${{ steps.compare.outputs.latest }}"
+          # Get SHA256 of the new version using their checksums file or calculating it directly
+          sha_url="https://github.com/netbirdio/netbird/releases/download/v${new_version}/netbird_${new_version}_linux_amd64.tar.gz"
+          new_sha="$(curl -fsSL "$sha_url" | sha256sum | cut -d' ' -f1)"
+          tmp="$(mktemp)"
+          jq --arg version "$new_version" --arg sha "$new_sha" \
+            '.netbirdVersion=$version | .netbirdSHA256=$sha' \
+            plugin/plugin.json > "$tmp"
+          mv "$tmp" plugin/plugin.json
+          echo "full_version=$new_version" >> "$GITHUB_OUTPUT"
+          echo "sha=$new_sha" >> "$GITHUB_OUTPUT"
+
+      - name: Commit and push branch
+        id: commit
+        if: steps.compare.outputs.update == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git checkout -B chore/netbird-update
+          git add plugin/plugin.json
+          if git commit -m "chore: update Netbird to ${{ steps.compare.outputs.latest }}"; then
+            git push --force origin chore/netbird-update
+            echo "made=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "No changes to commit."
+            echo "made=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Create or update PR
+        if: steps.compare.outputs.update == 'true' && steps.commit.outputs.made == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh pr create \
+            --title "chore: update Netbird to ${{ steps.compare.outputs.latest }}" \
+            --body "Automated update via workflow." \
+            --head chore/netbird-update \
+            --base trunk \
+            --label chore \
+            || gh pr edit chore/netbird-update \
+              --title "chore: update Netbird to ${{ steps.compare.outputs.latest }}" \
+              --body "Automated update via workflow."
