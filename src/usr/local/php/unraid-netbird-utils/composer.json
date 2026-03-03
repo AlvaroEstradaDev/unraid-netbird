@@ -19,7 +19,8 @@
     },
     "config": {
         "sort-packages": true,
-        "bin-dir": "../../../../../vendor/bin/"
+        "bin-dir": "../../../../../vendor/bin/",
+        "autoloader-suffix": "NetbirdUtils"
     },
     "repositories": [
         {
