@@ -255,6 +255,14 @@ class System extends \EDACerton\PluginUtils\System
             $custom_params .= " --allow-server-ssh";
         }
 
+        if ($config->AllowDNS) {
+            $custom_params .= " --accept-dns";
+        }
+
+        if ($config->AllowRoutes) {
+            $custom_params .= " --accept-routes";
+        }
+
         if ($config->WgPort > 0 && $config->WgPort <= 65535) {
             $custom_params .= " --wireguard-port " . intval($config->WgPort);
         }
