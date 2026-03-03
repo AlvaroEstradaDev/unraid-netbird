@@ -22,6 +22,7 @@ namespace Netbird;
 class LocalAPI
 {
     private Utils $utils;
+    private const SOCKET_PATH = '/var/run/netbird.sock';
 
     public function __construct()
     {
@@ -29,6 +30,11 @@ class LocalAPI
             throw new \RuntimeException("Common file not loaded.");
         }
         $this->utils = new Utils(PLUGIN_NAME);
+    }
+
+    public function isSocketAvailable(): bool
+    {
+        return file_exists(self::SOCKET_PATH) && (fileperms(self::SOCKET_PATH) & 0170000) === 0140000;
     }
 
     private function decodeJSONResponse(string $response): \stdClass
@@ -44,6 +50,9 @@ class LocalAPI
 
     public function isReady(): bool
     {
+        if ( ! $this->isSocketAvailable()) {
+            return false;
+        }
         try {
             $status = $this->getStatus();
             if (isset($status->Self->Online) && $status->Self->Online) {
@@ -57,6 +66,9 @@ class LocalAPI
 
     public function getStatus(): \stdClass
     {
+        if ( ! $this->isSocketAvailable()) {
+            return new \stdClass();
+        }
         try {
             $output = Utils::runwrap('netbird status --json 2>/dev/null', false, false);
             $raw    = $this->decodeJSONResponse(implode("\n", $output));
@@ -107,6 +119,9 @@ class LocalAPI
      */
     public function getRoutes(): array
     {
+        if ( ! $this->isSocketAvailable()) {
+            return [];
+        }
         try {
             $output = Utils::runwrap('netbird routes list 2>/dev/null', false, false);
             $routes = [];
