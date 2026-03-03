@@ -77,14 +77,20 @@ $netbirdInfo = $netbirdInfo ?? new Info($tr);
     function toggleSetting(setting, value)
     {
         netbirdControlsDisabled(true);
+        $('#netbirdRestartStatus').html('<span style="color: orange;"><i class="fa fa-spinner fa-spin"></i> <?= $tr->tr("settings.restarting"); ?></span>').show();
+        
         $.post('/plugins/netbird/include/data/Config.php', { action: 'toggle', setting: setting, value: value }, function (data)
         {
             if (data.success) {
                 setTimeout(function() {
-                    showNetbirdConfig();
-                }, 2000);
+                    $('#netbirdRestartStatus').html('<span style="color: green;"><i class="fa fa-check"></i> <?= $tr->tr("settings.restart_complete"); ?></span>');
+                    setTimeout(function() {
+                        $('#netbirdRestartStatus').fadeOut('slow');
+                        showNetbirdConfig();
+                    }, 500);
+                }, 7000);
             } else {
-                alert('Failed to toggle setting: ' + (data.error || 'Unknown error'));
+                $('#netbirdRestartStatus').html('<span style="color: red;"><i class="fa fa-exclamation-triangle"></i> ' + (data.error || 'Unknown error') + '</span>');
                 netbirdControlsDisabled(false);
             }
         }, "json");
@@ -189,6 +195,7 @@ $netbirdInfo = $netbirdInfo ?? new Info($tr);
     <tr>
         <td style="vertical-align: top">
             <input type="button" id="configTable_refresh" value="Refresh" onclick="showNetbirdConfig()">
+            <span id="netbirdRestartStatus" style="margin-left: 10px; display: none;"></span>
         </td>
     </tr>
 </table>

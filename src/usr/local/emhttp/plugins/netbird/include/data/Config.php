@@ -167,7 +167,7 @@ try {
             break;
         case 'toggle':
             $setting = $_POST['setting'] ?? '';
-            $value   = $_POST['value']   ?? '';
+            $value   = filter_var($_POST['value'] ?? '', FILTER_VALIDATE_BOOLEAN);
 
             $configFile = '/boot/config/plugins/netbird/netbird.cfg';
             $config     = file_exists($configFile) ? (parse_ini_file($configFile) ?: []) : [];
