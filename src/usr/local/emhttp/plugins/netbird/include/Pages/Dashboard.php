@@ -33,18 +33,21 @@ $netbird_dashboard = "<tr><td>" . $tr->tr("netbird_disabled") . "</td></tr>";
 
 if ($netbirdConfig->Enable) {
     $localAPI = $localAPI ?? new LocalAPI();
-    if ( ! $localAPI->isSocketAvailable()) {
-        $netbird_dashboard = "<tr><td>" . $tr->tr("warnings.not_ready") . "</td></tr>";
-    } elseif ( ! $localAPI->isReady()) {
+    if ( ! $localAPI->isReady()) {
         $netbird_dashboard = "<tr><td>" . $tr->tr("warnings.not_ready") . "</td></tr>";
     } else {
-        $netbirdInfo     = $netbirdInfo ?? new Info($tr);
-        $netbirdDashInfo = $netbirdInfo->getDashboardInfo();
+        try {
+            $netbirdInfo     = $netbirdInfo ?? new Info($tr);
+            $netbirdDashInfo = $netbirdInfo->getDashboardInfo();
 
-        $netbird_dashboard = Utils::printDash($tr->tr("info.online"), $netbirdDashInfo->Online);
-        $netbird_dashboard .= Utils::printDash($tr->tr("info.hostname"), $netbirdDashInfo->HostName);
-        $netbird_dashboard .= Utils::printDash($tr->tr("info.dns"), $netbirdDashInfo->DNSName);
-        $netbird_dashboard .= Utils::printDash($tr->tr("info.ip"), implode("<br><span class='w26'>&nbsp;</span>", $netbirdDashInfo->NetbirdIPs));
+            $netbird_dashboard = Utils::printDash($tr->tr("info.online"), $netbirdDashInfo->Online);
+            $netbird_dashboard .= Utils::printDash($tr->tr("info.hostname"), $netbirdDashInfo->HostName);
+            $netbird_dashboard .= Utils::printDash($tr->tr("info.dns"), $netbirdDashInfo->DNSName);
+            $netbird_dashboard .= Utils::printDash($tr->tr("info.ip"), implode("<br><span class='w26'>&nbsp;</span>", $netbirdDashInfo->NetbirdIPs));
+        } catch (\Throwable $e) {
+            Utils::logwrap("Dashboard error: " . $e->getMessage());
+            $netbird_dashboard = "<tr><td>" . $tr->tr("warnings.not_ready") . "</td></tr>";
+        }
     }
 }
 
