@@ -271,6 +271,11 @@ class System extends \EDACerton\PluginUtils\System
 
         $json['DisableDNS']          = ! $config->AllowDNS;
         $json['DisableClientRoutes'] = ! $config->AllowRoutes;
+        $json['ServerSSHAllowed']    = $config->SSH;
+
+        if ($config->WgPort > 0 && $config->WgPort <= 65535) {
+            $json['WgPort'] = $config->WgPort;
+        }
 
         $newContent = json_encode($json, JSON_PRETTY_PRINT);
         if ($newContent === false) {
@@ -278,24 +283,16 @@ class System extends \EDACerton\PluginUtils\System
             return;
         }
 
+        file_put_contents($configFile, $newContent);
+
         $disableDNS          = $json['DisableDNS'] ? 'true' : 'false';
         $disableClientRoutes = $json['DisableClientRoutes'] ? 'true' : 'false';
-        file_put_contents($configFile, $newContent);
-        Utils::logwrap("Updated netbird config.json: DisableDNS={$disableDNS}, DisableClientRoutes={$disableClientRoutes}");
+        $serverSSHAllowed    = $json['ServerSSHAllowed'] ? 'true' : 'false';
+        Utils::logwrap("Updated netbird config.json: DisableDNS={$disableDNS}, DisableClientRoutes={$disableClientRoutes}, ServerSSHAllowed={$serverSSHAllowed}");
     }
 
     public static function createNetbirdParamsFile(Config $config): void
     {
-        $custom_params = "";
-
-        if ($config->SSH) {
-            $custom_params .= " --allow-server-ssh";
-        }
-
-        if ($config->WgPort > 0 && $config->WgPort <= 65535) {
-            $custom_params .= " --wireguard-port " . intval($config->WgPort);
-        }
-
-        file_put_contents('/usr/local/emhttp/plugins/netbird/custom-params.sh', 'NETBIRD_CUSTOM_PARAMS="' . $custom_params . '"');
+        file_put_contents('/usr/local/emhttp/plugins/netbird/custom-params.sh', 'NETBIRD_CUSTOM_PARAMS=""');
     }
 }
