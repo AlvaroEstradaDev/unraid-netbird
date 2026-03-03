@@ -22,7 +22,14 @@ namespace Netbird;
 class LocalAPI
 {
     private Utils $utils;
-    private const SOCKET_PATH = '/var/run/netbird.sock';
+    private const SOCKET_PATH   = '/var/run/netbird.sock';
+    private const CACHE_TTL     = 30;
+    private const CACHE_FILE    = '/tmp/netbird-status-cache.json';
+    private const TIMEOUT_SHORT = 2;
+    private const TIMEOUT_LONG  = 5;
+
+    private static ?\stdClass $cachedStatus = null;
+    private static ?int $cacheTime          = null;
 
     public function __construct()
     {
@@ -37,79 +44,155 @@ class LocalAPI
         return file_exists(self::SOCKET_PATH) && (fileperms(self::SOCKET_PATH) & 0170000) === 0140000;
     }
 
-    private function decodeJSONResponse(string $response): \stdClass
+    public function isDaemonRunning(): bool
     {
-        $decoded = json_decode($response);
-
-        if (json_last_error() !== JSON_ERROR_NONE) {
-            throw new \RuntimeException("Failed to decode JSON response: " . json_last_error_msg());
-        }
-
-        return (object) $decoded;
+        $pid = shell_exec('pgrep -x netbird 2>/dev/null');
+        return ! empty(trim(is_string($pid) ? $pid : ''));
     }
 
     public function isReady(): bool
     {
-        if ( ! $this->isSocketAvailable()) {
-            return false;
-        }
-        try {
-            $status = $this->getStatus();
-            return isset($status->Self);
-        } catch (\RuntimeException $e) {
-            // No need to log here, as this is just a readiness check
-        }
-        return false;
+        return $this->isDaemonRunning() && $this->isSocketAvailable();
     }
 
-    public function getStatus(): \stdClass
+    private function decodeJSONResponse(string $response): \stdClass
     {
+        if (empty(trim($response))) {
+            return new \stdClass();
+        }
+
+        $decoded = json_decode($response);
+
+        if (json_last_error() !== JSON_ERROR_NONE || ! $decoded instanceof \stdClass) {
+            return new \stdClass();
+        }
+
+        return $decoded;
+    }
+
+    private function getCachedStatus(): ?\stdClass
+    {
+        if (self::$cachedStatus !== null && self::$cacheTime !== null) {
+            if ((time() - self::$cacheTime) < self::CACHE_TTL) {
+                return self::$cachedStatus;
+            }
+        }
+
+        if (file_exists(self::CACHE_FILE)) {
+            $cacheContent = file_get_contents(self::CACHE_FILE);
+            if ($cacheContent !== false) {
+                $cache = json_decode($cacheContent);
+                if (is_object($cache) && isset($cache->time, $cache->status)) {
+                    if ((time() - $cache->time) < self::CACHE_TTL) {
+                        self::$cachedStatus = $cache->status;
+                        self::$cacheTime    = $cache->time;
+                        return self::$cachedStatus;
+                    }
+                }
+            }
+        }
+
+        return null;
+    }
+
+    private function setCachedStatus(\stdClass $status): void
+    {
+        self::$cachedStatus = $status;
+        self::$cacheTime    = time();
+
+        $cache = [
+            'time'   => self::$cacheTime,
+            'status' => $status
+        ];
+
+        @file_put_contents(self::CACHE_FILE, json_encode($cache));
+    }
+
+    public function getStatus(bool $useCache = true): \stdClass
+    {
+        if ( ! $this->isDaemonRunning()) {
+            return new \stdClass();
+        }
+
         if ( ! $this->isSocketAvailable()) {
             return new \stdClass();
         }
-        try {
-            $output = Utils::runwrap('timeout 5 netbird status --json 2>/dev/null', false, false);
-            $raw    = $this->decodeJSONResponse(implode("\n", $output));
 
-            // Map Netbird JSON to expected format
-            $mapped                 = new \stdClass();
-            $mapped->Version        = $raw->daemonVersion ?? '';
-            $mapped->Self           = new \stdClass();
-            $mapped->Self->Online   = $raw->management->connected ?? false;
-            $mapped->Self->HostName = explode('.', $raw->fqdn ?? '')[0];
-            $mapped->Self->DNSName  = $raw->fqdn ?? '';
-            $ips                    = [];
-            if (isset($raw->netbirdIp)) {
-                $ips[] = explode('/', $raw->netbirdIp)[0];
+        if ($useCache) {
+            $cached = $this->getCachedStatus();
+            if ($cached !== null) {
+                return $cached;
             }
-            $mapped->NetbirdIPs       = $ips;
-            $mapped->Self->NetbirdIPs = $ips;
+        }
 
-            $mapped->Peer = new \stdClass();
-            if (isset($raw->peers->details)) {
-                foreach ($raw->peers->details as $peer) {
-                    $p                 = new \stdClass();
-                    $p->DNSName        = $peer->fqdn;
-                    $p->NetbirdIPs     = [$peer->netbirdIp];
-                    $p->Online         = $peer->status                                                                       === "Connected";
-                    $p->Active         = $peer->status                                                                       === "Connected";
-                    $p->Relay          = isset($peer->relayAddress) && isset($peer->connectionType) && $peer->connectionType === "Relayed" ? $peer->relayAddress : "";
-                    $p->CurAddr        = $peer->iceCandidateEndpoint->remote ?? "";
-                    $p->TxBytes        = $peer->transferSent                 ?? 0;
-                    $p->RxBytes        = $peer->transferReceived             ?? 0;
-                    $p->ExitNode       = false;
-                    $p->ExitNodeOption = false;
-                    $p->Tags           = [];
+        $command = sprintf(
+            'timeout %d netbird status --json 2>/dev/null',
+            $useCache ? self::TIMEOUT_SHORT : self::TIMEOUT_LONG
+        );
 
-                    $mapped->Peer->{$peer->publicKey} = $p;
-                }
-            }
+        $output     = [];
+        $returnCode = 0;
+        exec($command, $output, $returnCode);
 
-            return $mapped;
-        } catch (\RuntimeException $e) {
-            Utils::logwrap("Failed to get status: " . $e->getMessage());
+        if ($returnCode !== 0 || empty($output)) {
             return new \stdClass();
         }
+
+        $raw = $this->decodeJSONResponse(implode("\n", $output));
+
+        if ( ! isset($raw->management)) {
+            return new \stdClass();
+        }
+
+        $mapped                 = new \stdClass();
+        $mapped->Version        = $raw->daemonVersion ?? '';
+        $mapped->Self           = new \stdClass();
+        $mapped->Self->Online   = $raw->management->connected ?? false;
+        $mapped->Self->HostName = explode('.', $raw->fqdn ?? '')[0];
+        $mapped->Self->DNSName  = $raw->fqdn ?? '';
+
+        $ips = [];
+        if (isset($raw->netbirdIp)) {
+            $ips[] = explode('/', $raw->netbirdIp)[0];
+        }
+        $mapped->NetbirdIPs       = $ips;
+        $mapped->Self->NetbirdIPs = $ips;
+
+        $mapped->Peer = new \stdClass();
+        if (isset($raw->peers->details) && is_array($raw->peers->details)) {
+            foreach ($raw->peers->details as $peer) {
+                if ( ! is_object($peer) || ! isset($peer->publicKey)) {
+                    continue;
+                }
+
+                $p                 = new \stdClass();
+                $p->DNSName        = $peer->fqdn ?? '';
+                $p->NetbirdIPs     = isset($peer->netbirdIp) ? [$peer->netbirdIp] : [];
+                $p->Online         = ($peer->status ?? '') === "Connected";
+                $p->Active         = $p->Online;
+                $p->Relay          = "";
+                $p->CurAddr        = "";
+                $p->TxBytes        = $peer->transferSent     ?? 0;
+                $p->RxBytes        = $peer->transferReceived ?? 0;
+                $p->ExitNode       = false;
+                $p->ExitNodeOption = false;
+                $p->Tags           = [];
+
+                if (isset($peer->relayAddress) && isset($peer->connectionType) && $peer->connectionType === "Relayed") {
+                    $p->Relay = $peer->relayAddress;
+                }
+
+                if (isset($peer->iceCandidateEndpoint->remote)) {
+                    $p->CurAddr = $peer->iceCandidateEndpoint->remote;
+                }
+
+                $mapped->Peer->{$peer->publicKey} = $p;
+            }
+        }
+
+        $this->setCachedStatus($mapped);
+
+        return $mapped;
     }
 
     /**
@@ -117,64 +200,68 @@ class LocalAPI
      */
     public function getRoutes(): array
     {
+        if ( ! $this->isDaemonRunning()) {
+            return [];
+        }
+
         if ( ! $this->isSocketAvailable()) {
             return [];
         }
-        try {
-            $output = Utils::runwrap('timeout 5 netbird routes list 2>/dev/null', false, false);
-            $routes = [];
 
-            foreach ($output as $line) {
-                $line = trim($line);
-                if (empty($line) || $line === '-') {
-                    continue;
-                }
+        $command = sprintf('timeout %d netbird routes list 2>/dev/null', self::TIMEOUT_SHORT);
 
-                // Match network CIDR patterns (IPv4 or IPv6)
-                if (preg_match('/([\d.]+\/\d+|[\da-f:]+\/\d+)/i', $line, $matches)) {
-                    $network          = $matches[1];
-                    $selected         = stripos($line, 'Selected') !== false;
-                    $routes[$network] = $selected;
-                }
-            }
+        $output     = [];
+        $returnCode = 0;
+        exec($command, $output, $returnCode);
 
-            return $routes;
-        } catch (\RuntimeException $e) {
+        if ($returnCode !== 0 || empty($output)) {
             return [];
         }
+
+        $routes = [];
+
+        foreach ($output as $line) {
+            $line = trim($line);
+            if (empty($line) || $line === '-') {
+                continue;
+            }
+
+            if (preg_match('/([\d.]+\/\d+|[\da-f:]+\/\d+)/i', $line, $matches)) {
+                $network          = $matches[1];
+                $selected         = stripos($line, 'Selected') !== false;
+                $routes[$network] = $selected;
+            }
+        }
+
+        return $routes;
     }
 
     public function postLoginInteractive(): void
     {
-        try {
-            // Remove previous login log
-            if (file_exists('/tmp/netbird-login.log')) {
-                unlink('/tmp/netbird-login.log');
-            }
-            // Run netbird up in background and capture output
-            Utils::runwrap('nohup timeout 30 netbird up --no-browser > /tmp/netbird-login.log 2>&1 &', false, false);
-        } catch (\RuntimeException $e) {
-            Utils::logwrap("Failed to post login interactive: " . $e->getMessage());
+        if (file_exists('/tmp/netbird-login.log')) {
+            unlink('/tmp/netbird-login.log');
         }
+
+        $command = 'nohup timeout 30 netbird up --no-browser > /tmp/netbird-login.log 2>&1 &';
+        exec($command);
     }
 
     public function loginWithSetupKey(string $managementUrl, string $setupKey): bool
     {
-        try {
-            if (file_exists('/tmp/netbird-login.log')) {
-                unlink('/tmp/netbird-login.log');
-            }
-
-            $escapedUrl      = escapeshellarg($managementUrl);
-            $escapedSetupKey = escapeshellarg($setupKey);
-
-            $command = "nohup timeout 30 netbird up --management-url {$escapedUrl} --setup-key {$escapedSetupKey} > /tmp/netbird-login.log 2>&1 &";
-            Utils::runwrap($command, false, false);
-
-            return true;
-        } catch (\RuntimeException $e) {
-            Utils::logwrap("Failed to login with setup key: " . $e->getMessage());
-            return false;
+        if (file_exists('/tmp/netbird-login.log')) {
+            unlink('/tmp/netbird-login.log');
         }
+
+        $escapedUrl      = escapeshellarg($managementUrl);
+        $escapedSetupKey = escapeshellarg($setupKey);
+
+        $command = sprintf(
+            'nohup timeout 30 netbird up --management-url %s --setup-key %s > /tmp/netbird-login.log 2>&1 &',
+            $escapedUrl,
+            $escapedSetupKey
+        );
+        exec($command);
+
+        return true;
     }
 }
