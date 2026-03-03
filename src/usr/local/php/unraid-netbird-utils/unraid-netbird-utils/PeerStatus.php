@@ -36,4 +36,7 @@ class PeerStatus
     public bool $Traffic = false;
     public int $TxBytes  = 0;
     public int $RxBytes  = 0;
+
+    /** @var string[] */
+    public array $Networks = [];
 }

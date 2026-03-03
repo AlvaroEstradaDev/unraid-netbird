@@ -168,6 +168,7 @@ class Info
             $peer->LoginName = (isset($this->status->User) && isset($status->UserID))
                 ? ($this->status->User->{$status->UserID}->LoginName ?? "")
                 : "";
+            $peer->Networks = $status->Networks ?? [];
 
             if ($status->TxBytes > 0 || $status->RxBytes > 0) {
                 $peer->Traffic = true;
