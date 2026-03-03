@@ -4,7 +4,7 @@
 <PLUGIN 
   name="netbird"
   author="Alvaro Estrada"
-  version="2026.03.03.2157"
+  version="2026.03.03.2223"
   launch="Settings/Netbird"
   pluginURL="https://raw.githubusercontent.com/AlvaroEstradaDev/unraid-netbird/main/plugin/netbird.plg"
   support="https://forums.unraid.net/topic/"
@@ -15,6 +15,18 @@
 
 <CHANGES>
 <![CDATA[
+
+### 2026.03.03.2223
+
+### 🐛 Bug Fixes
+
+- fix: disable all buttons during restart to prevent race conditions ([#20](https://github.com/AlvaroEstradaDev/unraid-netbird/pull/20))
+
+This release disables ALL interactive buttons during a restart operation, not just the refresh button. This prevents race conditions that could occur if users rapidly click multiple toggle buttons.
+
+**Changes:**
+- Extended `netbirdControlsDisabled()` to disable all config and route table buttons
+- Prevents multiple concurrent restarts from rapid clicking
 
 ### 2026.03.03.2157
 
@@ -42,20 +54,6 @@ The `isReady()` function now correctly checks only:
 2. Socket file exists
 
 Connection status (online/offline, IPs, hostname) is properly displayed from the API status.
-
-### 2026.03.03.2117
-
-### 🐛 Bug Fixes
-
-- fix: add unique autoloader suffix to prevent conflict with tailscale plugin ([#17](https://github.com/AlvaroEstradaDev/unraid-netbird/pull/17))
-
-This release fixes a fatal PHP error that occurs when both the Netbird and Tailscale plugins are installed on the same Unraid server. The dashboard would crash with:
-
-```
-PHP Fatal error: Cannot declare class ComposerAutoloaderInit5e629f49773cc054ee1b10817d8c5bb2, because the name is already in use
-```
-
-Both plugins now use unique autoloader class names, allowing them to coexist peacefully.
 
 
 For older releases, see https://github.com/AlvaroEstradaDev/unraid-netbird/releases
@@ -99,9 +97,9 @@ if ($oldPlugin !== "") {
 <SHA256>10196c855c4ebd849e54325dde3b8727bc91c070b75a7abf9325326c0a7c72f6</SHA256>
 </FILE>
 
-<FILE Name="/boot/config/plugins/netbird/unraid-netbird-utils-2026.03.03.2157-noarch-1.txz">
-<URL>https://github.com/AlvaroEstradaDev/unraid-netbird/releases/download/2026.03.03.2157/unraid-netbird-utils-2026.03.03.2157-noarch-1.txz</URL>
-<SHA256>04ccf1cadc4064ba8bcf7bf00c22c7458b8e3c113e26ced2d1768f63f9467fd5</SHA256>
+<FILE Name="/boot/config/plugins/netbird/unraid-netbird-utils-2026.03.03.2223-noarch-1.txz">
+<URL>https://github.com/AlvaroEstradaDev/unraid-netbird/releases/download/2026.03.03.2223/unraid-netbird-utils-2026.03.03.2223-noarch-1.txz</URL>
+<SHA256>92a55aa08d119a51be55016ee618f7558fb6354578acf10b317f7988a3f5f418</SHA256>
 </FILE>
 
 <!--
@@ -119,7 +117,7 @@ if [ -L "/etc/rc.d/rc.netbird" ]; then
     rm -f /etc/rc.d/rc.netbird
 fi
 
-upgradepkg --install-new /boot/config/plugins/netbird/unraid-netbird-utils-2026.03.03.2157-noarch-1.txz
+upgradepkg --install-new /boot/config/plugins/netbird/unraid-netbird-utils-2026.03.03.2223-noarch-1.txz
 
 mkdir -p /usr/local/emhttp/plugins/netbird/bin
 tar xzf /boot/config/plugins/netbird/0.66.0.tar.gz -C /usr/local/emhttp/plugins/netbird/bin netbird
@@ -144,7 +142,7 @@ rm -f /var/log/plugins/netbird-trunk.plg
 netbird completion bash > /etc/bash_completion.d/netbird
 
 # cleanup old versions
-rm -f $(ls /boot/config/plugins/netbird/unraid-netbird-utils-*.txz 2>/dev/null | grep -v '2026.03.03.2157')
+rm -f $(ls /boot/config/plugins/netbird/unraid-netbird-utils-*.txz 2>/dev/null | grep -v '2026.03.03.2223')
 rm -f $(ls /boot/config/plugins/netbird/*.tar.gz 2>/dev/null | grep -v '0.66.0')
 
 # check to see if the state file has been backed up to Unraid Connect
@@ -168,7 +166,7 @@ fi
 echo ""
 echo "----------------------------------------------------"
 echo " netbird has been installed."
-echo " Version: 2026.03.03.2157"
+echo " Version: 2026.03.03.2223"
 echo "----------------------------------------------------"
 echo ""
 ]]>
