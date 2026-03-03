@@ -26,7 +26,7 @@ class LocalAPI
 
     public function __construct()
     {
-        if (!defined(__NAMESPACE__ . "\PLUGIN_ROOT") || !defined(__NAMESPACE__ . "\PLUGIN_NAME")) {
+        if ( ! defined(__NAMESPACE__ . "\PLUGIN_ROOT") || ! defined(__NAMESPACE__ . "\PLUGIN_NAME")) {
             throw new \RuntimeException("Common file not loaded.");
         }
         $this->utils = new Utils(PLUGIN_NAME);
@@ -34,11 +34,7 @@ class LocalAPI
 
     public function isSocketAvailable(): bool
     {
-        if (!file_exists(self::SOCKET_PATH)) {
-            return false;
-        }
-        $perms = fileperms(self::SOCKET_PATH);
-        return $perms !== false && ($perms & 0170000) === 0140000;
+        return file_exists(self::SOCKET_PATH) && (fileperms(self::SOCKET_PATH) & 0170000) === 0140000;
     }
 
     private function decodeJSONResponse(string $response): \stdClass
@@ -54,7 +50,7 @@ class LocalAPI
 
     public function isReady(): bool
     {
-        if (!$this->isSocketAvailable()) {
+        if ( ! $this->isSocketAvailable()) {
             return false;
         }
         try {
@@ -68,42 +64,42 @@ class LocalAPI
 
     public function getStatus(): \stdClass
     {
-        if (!$this->isSocketAvailable()) {
+        if ( ! $this->isSocketAvailable()) {
             return new \stdClass();
         }
         try {
             $output = Utils::runwrap('timeout 5 netbird status --json 2>/dev/null', false, false);
-            $raw = $this->decodeJSONResponse(implode("\n", $output));
+            $raw    = $this->decodeJSONResponse(implode("\n", $output));
 
             // Map Netbird JSON to expected format
-            $mapped = new \stdClass();
-            $mapped->Version = $raw->daemonVersion ?? '';
-            $mapped->Self = new \stdClass();
-            $mapped->Self->Online = $raw->management->connected ?? false;
+            $mapped                 = new \stdClass();
+            $mapped->Version        = $raw->daemonVersion ?? '';
+            $mapped->Self           = new \stdClass();
+            $mapped->Self->Online   = $raw->management->connected ?? false;
             $mapped->Self->HostName = explode('.', $raw->fqdn ?? '')[0];
-            $mapped->Self->DNSName = $raw->fqdn ?? '';
-            $ips = [];
+            $mapped->Self->DNSName  = $raw->fqdn ?? '';
+            $ips                    = [];
             if (isset($raw->netbirdIp)) {
                 $ips[] = explode('/', $raw->netbirdIp)[0];
             }
-            $mapped->NetbirdIPs = $ips;
+            $mapped->NetbirdIPs       = $ips;
             $mapped->Self->NetbirdIPs = $ips;
 
             $mapped->Peer = new \stdClass();
             if (isset($raw->peers->details)) {
                 foreach ($raw->peers->details as $peer) {
-                    $p = new \stdClass();
-                    $p->DNSName = $peer->fqdn;
-                    $p->NetbirdIPs = [$peer->netbirdIp];
-                    $p->Online = $peer->status === "Connected";
-                    $p->Active = $peer->status === "Connected";
-                    $p->Relay = isset($peer->relayAddress) && isset($peer->connectionType) && $peer->connectionType === "Relayed" ? $peer->relayAddress : "";
-                    $p->CurAddr = $peer->iceCandidateEndpoint->remote ?? "";
-                    $p->TxBytes = $peer->transferSent ?? 0;
-                    $p->RxBytes = $peer->transferReceived ?? 0;
-                    $p->ExitNode = false;
+                    $p                 = new \stdClass();
+                    $p->DNSName        = $peer->fqdn;
+                    $p->NetbirdIPs     = [$peer->netbirdIp];
+                    $p->Online         = $peer->status                                                                       === "Connected";
+                    $p->Active         = $peer->status                                                                       === "Connected";
+                    $p->Relay          = isset($peer->relayAddress) && isset($peer->connectionType) && $peer->connectionType === "Relayed" ? $peer->relayAddress : "";
+                    $p->CurAddr        = $peer->iceCandidateEndpoint->remote ?? "";
+                    $p->TxBytes        = $peer->transferSent                 ?? 0;
+                    $p->RxBytes        = $peer->transferReceived             ?? 0;
+                    $p->ExitNode       = false;
                     $p->ExitNodeOption = false;
-                    $p->Tags = [];
+                    $p->Tags           = [];
 
                     $mapped->Peer->{$peer->publicKey} = $p;
                 }
@@ -121,7 +117,7 @@ class LocalAPI
      */
     public function getRoutes(): array
     {
-        if (!$this->isSocketAvailable()) {
+        if ( ! $this->isSocketAvailable()) {
             return [];
         }
         try {
@@ -136,8 +132,8 @@ class LocalAPI
 
                 // Match network CIDR patterns (IPv4 or IPv6)
                 if (preg_match('/([\d.]+\/\d+|[\da-f:]+\/\d+)/i', $line, $matches)) {
-                    $network = $matches[1];
-                    $selected = stripos($line, 'Selected') !== false;
+                    $network          = $matches[1];
+                    $selected         = stripos($line, 'Selected') !== false;
                     $routes[$network] = $selected;
                 }
             }
@@ -169,7 +165,7 @@ class LocalAPI
                 unlink('/tmp/netbird-login.log');
             }
 
-            $escapedUrl = escapeshellarg($managementUrl);
+            $escapedUrl      = escapeshellarg($managementUrl);
             $escapedSetupKey = escapeshellarg($setupKey);
 
             $command = "nohup timeout 30 netbird up --management-url {$escapedUrl} --setup-key {$escapedSetupKey} > /tmp/netbird-login.log 2>&1 &";
