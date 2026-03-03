@@ -44,7 +44,7 @@ if ( ! Utils::pageChecks($tr)) {
     function showStatus()
     {
         controlsDisabled(true);
-        $.post('/plugins/netbird/include/data/Status.php', { action: 'get', mullvad: $("#statusTable_mullvad").prop('checked'), shared: $("#statusTable_shared").prop('checked') }, function (data)
+        $.post('/plugins/netbird/include/data/Status.php', { action: 'get', offline: $("#statusTable_offline").prop('checked'), routers: $("#statusTable_routers").prop('checked') }, function (data)
         {
             clearTimeout(timers.refresh);
             $("#statusTable").trigger("destroy");
@@ -92,8 +92,8 @@ if ( ! Utils::pageChecks($tr)) {
         <td style="vertical-align: top">
             <input type="button" id="statusTable_refresh" value="Refresh" onclick="showStatus()">
             <button type="button" class="reset">Reset Filters</button>
-            <input type="checkbox" id="statusTable_mullvad" onChange="showStatus()">Display inactive Mullvad nodes
-            <input type="checkbox" id="statusTable_shared" onChange="showStatus()">Display inactive shared-in nodes
+            <input type="checkbox" id="statusTable_offline" onChange="showStatus()"><?= $tr->tr('status_page.show_offline'); ?>
+            <input type="checkbox" id="statusTable_routers" onChange="showStatus()"><?= $tr->tr('status_page.show_routers'); ?>
         </td>
         <td>
             <div id="status_pingout" style="float: right;"></div>
