@@ -40,6 +40,8 @@ if ( ! Utils::pageChecks($tr)) {
     {
         $('#statusTable_refresh').prop('disabled', val);
         $('input.ping').prop('disabled', val);
+        $('input.ssh').prop('disabled', val);
+        $('input.copy-ip').prop('disabled', val);
     }
     function showStatus()
     {
@@ -76,6 +78,38 @@ if ( ! Utils::pageChecks($tr)) {
         var res = await $.post('/plugins/netbird/include/data/Status.php', { action: 'ping', host: host });
         $("#status_pingout").html("<strong>Ping response:</strong><br>" + res);
         showStatus();
+    }
+    function sshPeer(hostname)
+    {
+        var username = prompt("<?= $tr->tr('status_page.ssh_prompt'); ?>");
+        if (username === null) return; // Cancelled
+        
+        var sshCmd = username ? 
+            'netbird ssh ' + username + '@' + hostname :
+            'netbird ssh ' + hostname;
+        
+        copyToClipboard(sshCmd);
+        alert("<?= $tr->tr('status_page.ssh_copied'); ?>\n\n" + sshCmd + "\n\n<?= $tr->tr('status_page.ssh_instruction'); ?>");
+    }
+    function copyToClipboard(text)
+    {
+        var textarea = document.createElement('textarea');
+        textarea.value = text;
+        textarea.style.position = 'fixed';
+        textarea.style.opacity = '0';
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+    }
+    function copyIP(ip)
+    {
+        copyToClipboard(ip);
+        // Brief visual feedback - flash the button
+        var btn = event.target;
+        var originalValue = btn.value;
+        btn.value = "<?= $tr->tr('copied'); ?>";
+        setTimeout(function() { btn.value = originalValue; }, 1000);
     }
     showStatus();
 </script>

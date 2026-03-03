@@ -63,13 +63,20 @@ try {
                 $active     = $peer->Active ? $peer->Address : "";
                 $txBytes    = $peer->Traffic ? $peer->TxBytes : "";
                 $rxBytes    = $peer->Traffic ? $peer->RxBytes : "";
-                $pingHost   = (!$peer->Online) ? "" : "<input type='button' class='ping' value='Ping' onclick='pingHost(\"{$peer->Name}\")'>";
-                $ips        = implode("<br>", $peer->IP);
+                $pingHost   = (!$peer->Online) ? "" : "<input type='button' class='ping' value='{$tr->tr('ping')}' onclick='pingHost(\"{$peer->Name}\")'>";
+                $sshBtn     = (!$peer->Online) ? "" : "<input type='button' class='ssh' value='{$tr->tr('ssh')}' onclick='sshPeer(\"{$peer->Name}\")'>";
+                
+                // Build IP column with copy buttons
+                $ipColumn = "";
+                foreach ($peer->IP as $ip) {
+                    $ipColumn .= "<span style='white-space: nowrap;'>{$ip} <input type='button' class='copy-ip' value='📋' title='{$tr->tr('copy')}' onclick='copyIP(\"{$ip}\")' style='padding: 0 4px; font-size: 10px;'></span><br>";
+                }
+                $ipColumn = rtrim($ipColumn, "<br>");
 
                 $rows .= <<<EOT
                     <tr>
                         <td>{$user}</td>
-                        <td>{$ips}</td>
+                        <td>{$ipColumn}</td>
                         <td>{$peer->LoginName}</td>
                         <td>{$online}</td>
                         <td>{$networks}</td>
@@ -77,7 +84,7 @@ try {
                         <td>{$active}</td>
                         <td>{$txBytes}</td>
                         <td>{$rxBytes}</td>
-                        <td>{$pingHost}</td>
+                        <td>{$pingHost} {$sshBtn}</td>
                     </tr>
                     EOT;
             }

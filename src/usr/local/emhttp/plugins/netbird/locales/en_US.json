@@ -15,6 +15,10 @@
     "login": "Login",
     "add": "Add",
     "remove": "Remove",
+    "ping": "Ping",
+    "ssh": "SSH",
+    "copy": "Copy",
+    "copied": "Copied",
     "configuration": "Configuration",
     "needs_login": "This device needs to be logged in to Netbird. Refresh this page after logging in to view the status.",
     "netbird_disabled": "Netbird is currently disabled. It can be enabled via the Settings tab.",
@@ -94,20 +98,22 @@
         "tpm": "Enabling the TPM locks the Netbird node key to the specific hardware of this device. If the TPM is later disabled, the Netbird node key will become invalid and the device will need to be reauthenticated to Netbird. It is also possible for TPMs to lock out, which can disrupt Netbird connectivity and require reauthentication."
     },
     "status_page": {
-        "exit_node": "Exit Node",
+        "networks": "Networks",
         "connection_type": "Connection Type",
         "connection_addr": "Connection",
         "tx_bytes": "Tx Bytes",
         "rx_bytes": "Rx Bytes",
         "relay": "Relay",
         "direct": "Direct",
-        "exit_active": "Active",
-        "exit_available": "Available",
         "idle": "Idle",
         "offline": "Offline",
         "active": "Active",
         "login_name": "Login Name",
-        "shared": "Shared-In User",
-        "action": "Action"
+        "action": "Action",
+        "show_offline": "Display offline peers",
+        "show_routers": "Display network routers",
+        "ssh_prompt": "Enter SSH username (leave empty for default):",
+        "ssh_copied": "SSH Command Copied!",
+        "ssh_instruction": "Paste in terminal to connect."
     }
 }
