@@ -262,13 +262,14 @@ class System extends \EDACerton\PluginUtils\System
             return;
         }
 
+        /** @var array<string, mixed> $json */
         $json = json_decode($content, true);
         if (json_last_error() !== JSON_ERROR_NONE) {
             Utils::logwrap("Failed to parse netbird config.json: " . json_last_error_msg());
             return;
         }
 
-        $json['DisableDNS'] = ! $config->AllowDNS;
+        $json['DisableDNS']          = ! $config->AllowDNS;
         $json['DisableClientRoutes'] = ! $config->AllowRoutes;
 
         $newContent = json_encode($json, JSON_PRETTY_PRINT);
@@ -277,8 +278,10 @@ class System extends \EDACerton\PluginUtils\System
             return;
         }
 
+        $disableDNS          = $json['DisableDNS'] ? 'true' : 'false';
+        $disableClientRoutes = $json['DisableClientRoutes'] ? 'true' : 'false';
         file_put_contents($configFile, $newContent);
-        Utils::logwrap("Updated netbird config.json: DisableDNS=" . ($json['DisableDNS'] ? 'true' : 'false') . ", DisableClientRoutes=" . ($json['DisableClientRoutes'] ? 'true' : 'false'));
+        Utils::logwrap("Updated netbird config.json: DisableDNS={$disableDNS}, DisableClientRoutes={$disableClientRoutes}");
     }
 
     public static function createNetbirdParamsFile(Config $config): void
