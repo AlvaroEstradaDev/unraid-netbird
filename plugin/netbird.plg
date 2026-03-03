@@ -4,7 +4,7 @@
 <PLUGIN 
   name="netbird"
   author="Alvaro Estrada"
-  version="2026.03.03.0015"
+  version="2026.03.03.0438"
   launch="Settings/Netbird"
   pluginURL="https://raw.githubusercontent.com/AlvaroEstradaDev/unraid-netbird/main/plugin/netbird.plg"
   support="https://forums.unraid.net/topic/"
@@ -15,6 +15,14 @@
 
 <CHANGES>
 <![CDATA[
+
+### 2026.03.03.0438
+
+### 🐛 Bug Fixes
+
+- add missing --accept-dns and --accept-routes flags to netbird startup (#7)
+
+The toggle buttons for Accept DNS and Accept Routes saved the config but never passed the corresponding CLI flags to netbird service run, causing the daemon to fail when these options were enabled.
 
 ### 2026.03.03.0015
 
@@ -62,40 +70,6 @@ The `getStatus()` method maps `management->connected` from JSON to `Self->Online
 
 **Full Changelog**: https://github.com/AlvaroEstradaDev/unraid-netbird/compare/2026.03.02.2347...2026.03.02.2358
 
-### 2026.03.02.2347
-
-## Bug Fixes
-
-### Settings Page Auto-Refresh Issue (ROOT CAUSE FIXED!)
-- **Removed** 5-second auto-refresh script from `Utils::pageChecks()` function
-- **Fixed** issue where Info tab triggered page-wide refresh affecting Settings tab
-- **Removed** unnecessary timer clearing code from Settings page
-
-### Root Cause Analysis
-The auto-refresh was caused by:
-1. Unraid's tabbed interface loads all tabs in the background
-2. When Netbird wasn't ready, the Info tab called `Utils::pageChecks()`
-3. This function displayed "Netbird is not yet ready" and set a 5-second refresh timer
-4. The timer refreshed the **entire page**, clearing any form data in the Settings tab
-
-### Solution
-- Removed the forced auto-refresh - users can manually refresh when ready
-- This prevents data loss on the Settings page
-- Better UX - no unexpected page refreshes
-
-## Technical Details
-
-### Files Modified
-- `Utils.php`: Removed auto-refresh JavaScript from `pageChecks()` method
-- `Settings.php`: Removed aggressive timer clearing code (no longer needed)
-
-### Impact
-- Settings page will no longer auto-refresh and clear form inputs
-- Users will see "Netbird is not yet ready" message but can choose when to refresh
-- All tabs are now stable and won't unexpectedly refresh
-
-**Full Changelog**: https://github.com/AlvaroEstradaDev/unraid-netbird/compare/2026.03.02.2314...2026.03.02.2347
-
 
 For older releases, see https://github.com/AlvaroEstradaDev/unraid-netbird/releases
 ]]>
@@ -138,9 +112,9 @@ if ($oldPlugin !== "") {
 <SHA256>10196c855c4ebd849e54325dde3b8727bc91c070b75a7abf9325326c0a7c72f6</SHA256>
 </FILE>
 
-<FILE Name="/boot/config/plugins/netbird/unraid-netbird-utils-2026.03.03.0015-noarch-1.txz">
-<URL>https://github.com/AlvaroEstradaDev/unraid-netbird/releases/download/2026.03.03.0015/unraid-netbird-utils-2026.03.03.0015-noarch-1.txz</URL>
-<SHA256>dba6ea8ee15ab5db8c2daa2bf51ed6449e9870871e9f59bde04b459307fc48a5</SHA256>
+<FILE Name="/boot/config/plugins/netbird/unraid-netbird-utils-2026.03.03.0438-noarch-1.txz">
+<URL>https://github.com/AlvaroEstradaDev/unraid-netbird/releases/download/2026.03.03.0438/unraid-netbird-utils-2026.03.03.0438-noarch-1.txz</URL>
+<SHA256>dc079f3e5f5e1a112a0734765a25f38fa237cabc4665bc5234161db0de72f34a</SHA256>
 </FILE>
 
 <!--
@@ -158,7 +132,7 @@ if [ -L "/etc/rc.d/rc.netbird" ]; then
     rm -f /etc/rc.d/rc.netbird
 fi
 
-upgradepkg --install-new /boot/config/plugins/netbird/unraid-netbird-utils-2026.03.03.0015-noarch-1.txz
+upgradepkg --install-new /boot/config/plugins/netbird/unraid-netbird-utils-2026.03.03.0438-noarch-1.txz
 
 mkdir -p /usr/local/emhttp/plugins/netbird/bin
 tar xzf /boot/config/plugins/netbird/0.66.0.tar.gz -C /usr/local/emhttp/plugins/netbird/bin netbird
@@ -183,7 +157,7 @@ rm -f /var/log/plugins/netbird-trunk.plg
 netbird completion bash > /etc/bash_completion.d/netbird
 
 # cleanup old versions
-rm -f $(ls /boot/config/plugins/netbird/unraid-netbird-utils-*.txz 2>/dev/null | grep -v '2026.03.03.0015')
+rm -f $(ls /boot/config/plugins/netbird/unraid-netbird-utils-*.txz 2>/dev/null | grep -v '2026.03.03.0438')
 rm -f $(ls /boot/config/plugins/netbird/*.tar.gz 2>/dev/null | grep -v '0.66.0')
 
 # check to see if the state file has been backed up to Unraid Connect
@@ -207,7 +181,7 @@ fi
 echo ""
 echo "----------------------------------------------------"
 echo " netbird has been installed."
-echo " Version: 2026.03.03.0015"
+echo " Version: 2026.03.03.0438"
 echo "----------------------------------------------------"
 echo ""
 ]]>
