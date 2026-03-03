@@ -190,6 +190,7 @@ try {
 
                 $newConfig = new Config();
                 System::createNetbirdParamsFile($newConfig);
+                System::updateNetbirdConfig($newConfig);
 
                 Utils::runwrap('/usr/local/emhttp/plugins/netbird/restart.sh');
 
