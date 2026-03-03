@@ -70,7 +70,7 @@ try {
                 // Build IP column with copy buttons
                 $ipColumn = "";
                 foreach ($peer->IP as $ip) {
-                    $ipColumn .= "<span style='white-space: nowrap;'>{$ip} <input type='button' class='copy-ip' value='📋' title='{$tr->tr('copy')}' onclick='copyIP(\"{$ip}\")' style='padding: 0 4px; font-size: 10px;'></span><br>";
+                    $ipColumn .= "<span style='white-space: nowrap;'>{$ip} <span class='copy-ip' style='cursor: pointer; font-size: 14px;' title='{$tr->tr('copy')}' onclick='copyIP(\"{$ip}\")'>📋</span></span><br>";
                 }
                 $ipColumn = rtrim($ipColumn, "<br>");
 
