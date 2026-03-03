@@ -4,7 +4,7 @@
 <PLUGIN 
   name="netbird"
   author="Alvaro Estrada"
-  version="2026.03.03.2117"
+  version="2026.03.03.2130"
   launch="Settings/Netbird"
   pluginURL="https://raw.githubusercontent.com/AlvaroEstradaDev/unraid-netbird/main/plugin/netbird.plg"
   support="https://forums.unraid.net/topic/"
@@ -15,6 +15,20 @@
 
 <CHANGES>
 <![CDATA[
+
+### 2026.03.03.2130
+
+### 🐛 Bug Fixes
+
+- fix: remove overly strict hasIP() check from dashboard readiness ([#18](https://github.com/AlvaroEstradaDev/unraid-netbird/pull/18))
+
+This release fixes the dashboard widget being stuck showing "Netbird is not yet ready" even when the daemon was running and connected. The `hasIP()` check was too strict and has been removed from the dashboard readiness condition.
+
+The `isReady()` function now correctly checks only:
+1. Daemon process is running
+2. Socket file exists
+
+Connection status (online/offline, IPs, hostname) is properly displayed from the API status.
 
 ### 2026.03.03.2117
 
@@ -78,12 +92,6 @@ The dashboard widget was crashing Unraid's main dashboard because `isReady()` wa
 6. **Log rotation** - Prevents log files from growing unbounded (1MB limit)
 7. **Rate-limited watcher** - Reduces "Waiting for IP" logs by 97%
 
-### 2026.03.03.2010
-
-### 🐛 Bug Fixes
-
-- fix: prevent dashboard crash with optimized LocalAPI ([#15](https://github.com/AlvaroEstradaDev/unraid-netbird/pull/15))
-
 
 For older releases, see https://github.com/AlvaroEstradaDev/unraid-netbird/releases
 ]]>
@@ -126,9 +134,9 @@ if ($oldPlugin !== "") {
 <SHA256>10196c855c4ebd849e54325dde3b8727bc91c070b75a7abf9325326c0a7c72f6</SHA256>
 </FILE>
 
-<FILE Name="/boot/config/plugins/netbird/unraid-netbird-utils-2026.03.03.2117-noarch-1.txz">
-<URL>https://github.com/AlvaroEstradaDev/unraid-netbird/releases/download/2026.03.03.2117/unraid-netbird-utils-2026.03.03.2117-noarch-1.txz</URL>
-<SHA256>59f96878151d06f38731e7f1aab21d4bf6ee0bd2f53f940955995e16141e8911</SHA256>
+<FILE Name="/boot/config/plugins/netbird/unraid-netbird-utils-2026.03.03.2130-noarch-1.txz">
+<URL>https://github.com/AlvaroEstradaDev/unraid-netbird/releases/download/2026.03.03.2130/unraid-netbird-utils-2026.03.03.2130-noarch-1.txz</URL>
+<SHA256>fbd99e915955b5d5a62a1d23fc4347c5a5fe8f66a1b1f3f4127c40cbe9a1c479</SHA256>
 </FILE>
 
 <!--
@@ -146,7 +154,7 @@ if [ -L "/etc/rc.d/rc.netbird" ]; then
     rm -f /etc/rc.d/rc.netbird
 fi
 
-upgradepkg --install-new /boot/config/plugins/netbird/unraid-netbird-utils-2026.03.03.2117-noarch-1.txz
+upgradepkg --install-new /boot/config/plugins/netbird/unraid-netbird-utils-2026.03.03.2130-noarch-1.txz
 
 mkdir -p /usr/local/emhttp/plugins/netbird/bin
 tar xzf /boot/config/plugins/netbird/0.66.0.tar.gz -C /usr/local/emhttp/plugins/netbird/bin netbird
@@ -171,7 +179,7 @@ rm -f /var/log/plugins/netbird-trunk.plg
 netbird completion bash > /etc/bash_completion.d/netbird
 
 # cleanup old versions
-rm -f $(ls /boot/config/plugins/netbird/unraid-netbird-utils-*.txz 2>/dev/null | grep -v '2026.03.03.2117')
+rm -f $(ls /boot/config/plugins/netbird/unraid-netbird-utils-*.txz 2>/dev/null | grep -v '2026.03.03.2130')
 rm -f $(ls /boot/config/plugins/netbird/*.tar.gz 2>/dev/null | grep -v '0.66.0')
 
 # check to see if the state file has been backed up to Unraid Connect
@@ -195,7 +203,7 @@ fi
 echo ""
 echo "----------------------------------------------------"
 echo " netbird has been installed."
-echo " Version: 2026.03.03.2117"
+echo " Version: 2026.03.03.2130"
 echo "----------------------------------------------------"
 echo ""
 ]]>
