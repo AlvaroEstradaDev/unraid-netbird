@@ -73,6 +73,22 @@ $netbirdInfo = $netbirdInfo ?? new Info($tr);
             validateNetbirdRoute();
         }, "json");
     }
+    
+    function toggleSetting(setting, value)
+    {
+        netbirdControlsDisabled(true);
+        $.post('/plugins/netbird/include/data/Config.php', { action: 'toggle', setting: setting, value: value }, function (data)
+        {
+            if (data.success) {
+                setTimeout(function() {
+                    showNetbirdConfig();
+                }, 2000);
+            } else {
+                alert('Failed to toggle setting: ' + (data.error || 'Unknown error'));
+                netbirdControlsDisabled(false);
+            }
+        }, "json");
+    }
 
 
     const CIDRResult = Object.freeze({
