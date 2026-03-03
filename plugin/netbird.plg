@@ -4,7 +4,7 @@
 <PLUGIN 
   name="netbird"
   author="Alvaro Estrada"
-  version="2026.03.03.1635"
+  version="2026.03.03.1745"
   launch="Settings/Netbird"
   pluginURL="https://raw.githubusercontent.com/AlvaroEstradaDev/unraid-netbird/main/plugin/netbird.plg"
   support="https://forums.unraid.net/topic/"
@@ -15,6 +15,21 @@
 
 <CHANGES>
 <![CDATA[
+
+### 2026.03.03.1745
+
+### 🐛 Bug Fixes
+
+- fix: add timeout to CLI commands and improve dashboard reliability (#12)
+
+ - Add 5-second timeout to `netbird status` and `netbird routes list` CLI commands to prevent hanging
+ - Add 30-second timeout to login commands (background processes)
+ - Improve `isReady()` to return true on any valid response, not just when online
+ - Add early socket availability check in dashboard before calling `isReady()`
+ - Add AJAX auto-refresh (5s) for dashboard widget when not ready
+ - Create new `Dashboard.php` AJAX endpoint for widget-only refresh
+
+ This prevents the dashboard from crashing when the netbird daemon is unresponsive or in a transitional state. The settings page is not affected by auto-refresh, allowing users to enter login credentials without interruption.
 
 ### 2026.03.03.1635
 
@@ -41,18 +56,6 @@
  The CLI flags `--accept-dns` and `--accept-routes` don't exist in netbird's `service run` command, causing the daemon to crash immediately on startup. Settings now properly update netbird's config.json file instead (`DisableDNS` and `DisableClientRoutes` fields).
 
 - fix: check socket availability before running netbird commands (#8)
-
- When the netbird daemon is not running, netbird CLI commands block waiting for the socket timeout (30+ seconds). Multiple PHP processes spawning and blocking caused CPU exhaustion. Added socket availability check to return early.
-
-### 2026.03.03.1605
-
-### 🐛 Bug Fixes
-
-- add missing --accept-dns and --accept-routes flags to netbird startup (#7)
-
- The toggle buttons for Accept DNS and Accept Routes saved the config but never passed the corresponding CLI flags to netbird service run, causing the daemon to fail when these options were enabled.
-
-- check socket availability before running netbird commands (#8)
 
  When the netbird daemon is not running, netbird CLI commands block waiting for the socket timeout (30+ seconds). Multiple PHP processes spawning and blocking caused CPU exhaustion. Added socket availability check to return early.
 
@@ -98,9 +101,9 @@ if ($oldPlugin !== "") {
 <SHA256>10196c855c4ebd849e54325dde3b8727bc91c070b75a7abf9325326c0a7c72f6</SHA256>
 </FILE>
 
-<FILE Name="/boot/config/plugins/netbird/unraid-netbird-utils-2026.03.03.1635-noarch-1.txz">
-<URL>https://github.com/AlvaroEstradaDev/unraid-netbird/releases/download/2026.03.03.1635/unraid-netbird-utils-2026.03.03.1635-noarch-1.txz</URL>
-<SHA256>ccd81b49b005419aeff2fce5883e7bbea56d850ad2a7347b87c44a7e04286e34</SHA256>
+<FILE Name="/boot/config/plugins/netbird/unraid-netbird-utils-2026.03.03.1745-noarch-1.txz">
+<URL>https://github.com/AlvaroEstradaDev/unraid-netbird/releases/download/2026.03.03.1745/unraid-netbird-utils-2026.03.03.1745-noarch-1.txz</URL>
+<SHA256>27b7e9833998492abcbae973c8032eb3bfc82c38551e8bfa6c5fb69261dedd3b</SHA256>
 </FILE>
 
 <!--
@@ -118,7 +121,7 @@ if [ -L "/etc/rc.d/rc.netbird" ]; then
     rm -f /etc/rc.d/rc.netbird
 fi
 
-upgradepkg --install-new /boot/config/plugins/netbird/unraid-netbird-utils-2026.03.03.1635-noarch-1.txz
+upgradepkg --install-new /boot/config/plugins/netbird/unraid-netbird-utils-2026.03.03.1745-noarch-1.txz
 
 mkdir -p /usr/local/emhttp/plugins/netbird/bin
 tar xzf /boot/config/plugins/netbird/0.66.0.tar.gz -C /usr/local/emhttp/plugins/netbird/bin netbird
@@ -143,7 +146,7 @@ rm -f /var/log/plugins/netbird-trunk.plg
 netbird completion bash > /etc/bash_completion.d/netbird
 
 # cleanup old versions
-rm -f $(ls /boot/config/plugins/netbird/unraid-netbird-utils-*.txz 2>/dev/null | grep -v '2026.03.03.1635')
+rm -f $(ls /boot/config/plugins/netbird/unraid-netbird-utils-*.txz 2>/dev/null | grep -v '2026.03.03.1745')
 rm -f $(ls /boot/config/plugins/netbird/*.tar.gz 2>/dev/null | grep -v '0.66.0')
 
 # check to see if the state file has been backed up to Unraid Connect
@@ -167,7 +170,7 @@ fi
 echo ""
 echo "----------------------------------------------------"
 echo " netbird has been installed."
-echo " Version: 2026.03.03.1635"
+echo " Version: 2026.03.03.1745"
 echo "----------------------------------------------------"
 echo ""
 ]]>
