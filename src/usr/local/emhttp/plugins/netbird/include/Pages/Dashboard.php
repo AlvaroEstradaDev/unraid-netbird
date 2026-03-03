@@ -33,7 +33,7 @@ $netbird_dashboard = "<tr><td>" . $tr->tr("netbird_disabled") . "</td></tr>";
 
 if ($netbirdConfig->Enable) {
     $localAPI = $localAPI ?? new LocalAPI();
-    if ( ! $localAPI->isReady() || ! $localAPI->hasIP()) {
+    if ( ! $localAPI->isReady()) {
         $netbird_dashboard = "<tr><td>" . $tr->tr("warnings.not_ready") . "</td></tr>";
     } else {
         try {
