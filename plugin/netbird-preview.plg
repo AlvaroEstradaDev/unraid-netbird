@@ -4,7 +4,7 @@
 <PLUGIN 
   name="netbird"
   author="Alvaro Estrada"
-  version="2026.03.03.2040"
+  version="2026.03.03.2117"
   launch="Settings/Netbird"
   pluginURL="https://raw.githubusercontent.com/AlvaroEstradaDev/unraid-netbird/preview/plugin/netbird-preview.plg"
   support="https://forums.unraid.net/topic/"
@@ -15,6 +15,20 @@
 
 <CHANGES>
 <![CDATA[
+
+### 2026.03.03.2117
+
+### 🐛 Bug Fixes
+
+- fix: add unique autoloader suffix to prevent conflict with tailscale plugin ([#17](https://github.com/AlvaroEstradaDev/unraid-netbird/pull/17))
+
+This release fixes a fatal PHP error that occurs when both the Netbird and Tailscale plugins are installed on the same Unraid server. The dashboard would crash with:
+
+```
+PHP Fatal error: Cannot declare class ComposerAutoloaderInit5e629f49773cc054ee1b10817d8c5bb2, because the name is already in use
+```
+
+Both plugins now use unique autoloader class names, allowing them to coexist peacefully.
 
 ### 2026.03.03.2040
 
@@ -70,44 +84,6 @@ The dashboard widget was crashing Unraid's main dashboard because `isReady()` wa
 
 - fix: prevent dashboard crash with optimized LocalAPI ([#15](https://github.com/AlvaroEstradaDev/unraid-netbird/pull/15))
 
-### 2026.03.03.1909
-
-## 🐛 Bug Fixes
-
-### fix: prevent dashboard crash with optimized LocalAPI (#15)
-
-The dashboard widget was crashing Unraid's main dashboard because `isReady()` was blocking for ~1.6 seconds while waiting for the netbird CLI to respond.
-
-#### Changes
-
-**LocalAPI.php optimizations:**
-- **Fast `isReady()`**: Now checks daemon process (`pgrep`) + socket file only (~17ms instead of ~1.6s)
-- **Status caching**: Results cached for 30 seconds in `/tmp/netbird-status-cache.json`
-- **Two-tier caching**: In-memory static cache + file cache for cross-process sharing
-- **Better error handling**: Never throws exceptions, returns empty objects on failure
-- **Cleaner code**: Direct `exec()` calls with return code checks
-
-**Dashboard.php improvements:**
-- Simplified readiness check (single `isReady()` call)
-- Added try-catch around `Info` object creation
-- Logs errors but gracefully shows "not ready" message
-
-#### Performance Results
-
-| Scenario | Before | After |
-|----------|--------|-------|
-| `isReady()` | ~1,600ms | ~17ms |
-| First `getStatus()` | ~1,600ms | ~1,500ms |
-| Cached `getStatus()` | ~1,600ms | ~16ms |
-| Dashboard load (cached) | ~1,600ms | ~40ms |
-
-#### Why This Prevents Crashes
-
-1. **`isReady()` is instant** - No CLI call, just checks process + socket
-2. **`getStatus()` is cached** - Only one CLI call per 30 seconds across all processes
-3. **File cache is shared** - Multiple PHP processes benefit from same cache
-4. **Graceful degradation** - Errors show "not ready" instead of crashing
-
 
 For older releases, see https://github.com/AlvaroEstradaDev/unraid-netbird/releases
 ]]>
@@ -150,9 +126,9 @@ if ($oldPlugin !== "") {
 <SHA256>10196c855c4ebd849e54325dde3b8727bc91c070b75a7abf9325326c0a7c72f6</SHA256>
 </FILE>
 
-<FILE Name="/boot/config/plugins/netbird/unraid-netbird-utils-2026.03.03.2040-noarch-1.txz">
-<URL>https://github.com/AlvaroEstradaDev/unraid-netbird/releases/download/2026.03.03.2040/unraid-netbird-utils-2026.03.03.2040-noarch-1.txz</URL>
-<SHA256>a9befdfc5ef57d5aff7f9602bb7b5d2bf1102fe17f810268de258f45fa5be0a1</SHA256>
+<FILE Name="/boot/config/plugins/netbird/unraid-netbird-utils-2026.03.03.2117-noarch-1.txz">
+<URL>https://github.com/AlvaroEstradaDev/unraid-netbird/releases/download/2026.03.03.2117/unraid-netbird-utils-2026.03.03.2117-noarch-1.txz</URL>
+<SHA256>59f96878151d06f38731e7f1aab21d4bf6ee0bd2f53f940955995e16141e8911</SHA256>
 </FILE>
 
 <!--
@@ -170,7 +146,7 @@ if [ -L "/etc/rc.d/rc.netbird" ]; then
     rm -f /etc/rc.d/rc.netbird
 fi
 
-upgradepkg --install-new /boot/config/plugins/netbird/unraid-netbird-utils-2026.03.03.2040-noarch-1.txz
+upgradepkg --install-new /boot/config/plugins/netbird/unraid-netbird-utils-2026.03.03.2117-noarch-1.txz
 
 mkdir -p /usr/local/emhttp/plugins/netbird/bin
 tar xzf /boot/config/plugins/netbird/0.66.0.tar.gz -C /usr/local/emhttp/plugins/netbird/bin netbird
@@ -197,7 +173,7 @@ sed -i "s/Netbird\*\*/Netbird (Preview)**/" /usr/local/emhttp/plugins/netbird/RE
 netbird completion bash > /etc/bash_completion.d/netbird
 
 # cleanup old versions
-rm -f $(ls /boot/config/plugins/netbird/unraid-netbird-utils-*.txz 2>/dev/null | grep -v '2026.03.03.2040')
+rm -f $(ls /boot/config/plugins/netbird/unraid-netbird-utils-*.txz 2>/dev/null | grep -v '2026.03.03.2117')
 rm -f $(ls /boot/config/plugins/netbird/*.tar.gz 2>/dev/null | grep -v '0.66.0')
 
 # check to see if the state file has been backed up to Unraid Connect
@@ -221,7 +197,7 @@ fi
 echo ""
 echo "----------------------------------------------------"
 echo " netbird has been installed."
-echo " Version: 2026.03.03.2040"
+echo " Version: 2026.03.03.2117"
 echo "----------------------------------------------------"
 echo ""
 ]]>
