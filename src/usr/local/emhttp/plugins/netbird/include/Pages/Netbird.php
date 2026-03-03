@@ -55,6 +55,9 @@ $netbirdInfo = $netbirdInfo ?? new Info($tr);
     function netbirdControlsDisabled(val)
     {
         $('#configTable_refresh').prop('disabled', val);
+        $('#configTable input[type="button"]').prop('disabled', val);
+        $('#routesTable input[type="button"]').prop('disabled', val);
+        $('#addNetbirdRoute').prop('disabled', val || !$('#addNetbirdRoute').data('valid'));
     }
     function showNetbirdConfig()
     {
