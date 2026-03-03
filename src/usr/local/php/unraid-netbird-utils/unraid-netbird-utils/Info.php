@@ -168,14 +168,6 @@ class Info
             $peer->LoginName = (isset($this->status->User) && isset($status->UserID))
                 ? ($this->status->User->{$status->UserID}->LoginName ?? "")
                 : "";
-            $peer->SharedUser = isset($status->ShareeNode);
-
-            if ($status->ExitNode) {
-                $peer->ExitNodeActive = true;
-            } elseif ($status->ExitNodeOption) {
-                $peer->ExitNodeAvailable = true;
-            }
-            $peer->Mullvad = in_array("tag:mullvad-exit-node", $status->Tags ?? array());
 
             if ($status->TxBytes > 0 || $status->RxBytes > 0) {
                 $peer->Traffic = true;

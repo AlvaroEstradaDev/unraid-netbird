@@ -183,8 +183,6 @@ class LocalAPI
                 $p->CurAddr        = "";
                 $p->TxBytes        = $peer->transferSent     ?? 0;
                 $p->RxBytes        = $peer->transferReceived ?? 0;
-                $p->ExitNode       = false;
-                $p->ExitNodeOption = false;
                 $p->Tags           = [];
 
                 if (isset($peer->relayAddress) && isset($peer->connectionType) && $peer->connectionType === "Relayed") {
