@@ -4,7 +4,7 @@
 <PLUGIN 
   name="netbird"
   author="Alvaro Estrada"
-  version="2026.03.03.2323"
+  version="2026.03.03.2334"
   launch="Settings/Netbird"
   pluginURL="https://raw.githubusercontent.com/AlvaroEstradaDev/unraid-netbird/main/plugin/netbird.plg"
   support="https://forums.unraid.net/topic/"
@@ -15,6 +15,25 @@
 
 <CHANGES>
 <![CDATA[
+
+### 2026.03.03.2334
+
+## What's Changed
+
+### 🐛 Bug Fixes
+* Replace `netbird ping` with regular `ping -c 3 -w 5` command (fixes #22)
+ - Netbird CLI does not have a ping command (Tailscale-specific feature)
+ - Regular ping works through the Netbird tunnel interface
+
+### 🚀 Features (from 2026.03.03.2323)
+* Replace Tailscale features with Netbird-native filters and actions (#21)
+ - Replace "Display inactive Mullvad nodes" → "Display offline peers"
+ - Replace "Display inactive shared-in nodes" → "Display network routers"
+ - Replace "Exit Node" column with "Networks" column
+ - Add SSH button with username prompt
+ - Add per-IP copy buttons
+
+**Full Changelog**: https://github.com/AlvaroEstradaDev/unraid-netbird/compare/2026.03.03.2323...2026.03.03.2334
 
 ### 2026.03.03.2323
 
@@ -35,18 +54,6 @@
 * Update English and Spanish locales for new features
 
 **Full Changelog**: https://github.com/AlvaroEstradaDev/unraid-netbird/compare/2026.03.03.2223...2026.03.03.2323
-
-### 2026.03.03.2223
-
-### 🐛 Bug Fixes
-
-- fix: disable all buttons during restart to prevent race conditions ([#20](https://github.com/AlvaroEstradaDev/unraid-netbird/pull/20))
-
-This release disables ALL interactive buttons during a restart operation, not just the refresh button. This prevents race conditions that could occur if users rapidly click multiple toggle buttons.
-
-**Changes:**
-- Extended `netbirdControlsDisabled()` to disable all config and route table buttons
-- Prevents multiple concurrent restarts from rapid clicking
 
 ### 2026.03.03.2157
 
@@ -103,9 +110,9 @@ if ($oldPlugin !== "") {
 <SHA256>10196c855c4ebd849e54325dde3b8727bc91c070b75a7abf9325326c0a7c72f6</SHA256>
 </FILE>
 
-<FILE Name="/boot/config/plugins/netbird/unraid-netbird-utils-2026.03.03.2323-noarch-1.txz">
-<URL>https://github.com/AlvaroEstradaDev/unraid-netbird/releases/download/2026.03.03.2323/unraid-netbird-utils-2026.03.03.2323-noarch-1.txz</URL>
-<SHA256>c17dea08d253fb89bc69651e2b68399bffe2c8b8a3ea566f184412d6b6603118</SHA256>
+<FILE Name="/boot/config/plugins/netbird/unraid-netbird-utils-2026.03.03.2334-noarch-1.txz">
+<URL>https://github.com/AlvaroEstradaDev/unraid-netbird/releases/download/2026.03.03.2334/unraid-netbird-utils-2026.03.03.2334-noarch-1.txz</URL>
+<SHA256>fc0c815a1d044df16f1f18e6fdbaea25c977cc7c4d5f995199b39d44669a6725</SHA256>
 </FILE>
 
 <!--
@@ -123,7 +130,7 @@ if [ -L "/etc/rc.d/rc.netbird" ]; then
     rm -f /etc/rc.d/rc.netbird
 fi
 
-upgradepkg --install-new /boot/config/plugins/netbird/unraid-netbird-utils-2026.03.03.2323-noarch-1.txz
+upgradepkg --install-new /boot/config/plugins/netbird/unraid-netbird-utils-2026.03.03.2334-noarch-1.txz
 
 mkdir -p /usr/local/emhttp/plugins/netbird/bin
 tar xzf /boot/config/plugins/netbird/0.66.0.tar.gz -C /usr/local/emhttp/plugins/netbird/bin netbird
@@ -148,7 +155,7 @@ rm -f /var/log/plugins/netbird-trunk.plg
 netbird completion bash > /etc/bash_completion.d/netbird
 
 # cleanup old versions
-rm -f $(ls /boot/config/plugins/netbird/unraid-netbird-utils-*.txz 2>/dev/null | grep -v '2026.03.03.2323')
+rm -f $(ls /boot/config/plugins/netbird/unraid-netbird-utils-*.txz 2>/dev/null | grep -v '2026.03.03.2334')
 rm -f $(ls /boot/config/plugins/netbird/*.tar.gz 2>/dev/null | grep -v '0.66.0')
 
 # check to see if the state file has been backed up to Unraid Connect
@@ -172,7 +179,7 @@ fi
 echo ""
 echo "----------------------------------------------------"
 echo " netbird has been installed."
-echo " Version: 2026.03.03.2323"
+echo " Version: 2026.03.03.2334"
 echo "----------------------------------------------------"
 echo ""
 ]]>
