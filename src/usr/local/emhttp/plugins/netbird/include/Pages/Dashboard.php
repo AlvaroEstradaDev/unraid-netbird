@@ -30,11 +30,16 @@ $tr = $tr ?? new Translator(PLUGIN_ROOT);
 $netbirdConfig = $netbirdConfig ?? new Config();
 
 $netbird_dashboard = "<tr><td>" . $tr->tr("netbird_disabled") . "</td></tr>";
+$autoRefresh       = false;
 
 if ($netbirdConfig->Enable) {
     $localAPI = $localAPI ?? new LocalAPI();
-    if ( ! $localAPI->isReady()) {
+    if ( ! $localAPI->isSocketAvailable()) {
         $netbird_dashboard = "<tr><td>" . $tr->tr("warnings.not_ready") . "</td></tr>";
+        $autoRefresh       = true;
+    } elseif ( ! $localAPI->isReady()) {
+        $netbird_dashboard = "<tr><td>" . $tr->tr("warnings.not_ready") . "</td></tr>";
+        $autoRefresh       = true;
     } else {
         $netbirdInfo     = $netbirdInfo ?? new Info($tr);
         $netbirdDashInfo = $netbirdInfo->getDashboardInfo();
@@ -78,6 +83,20 @@ if ( ! $isResponsiveWebgui) {
                     return $(this).text() + "<br>";
                 });
                 $('#netbird-settings-button').prependTo('#netbird-dashboard-card');
+            });
+        </script>
+        EOT;
+}
+
+if ($autoRefresh) {
+    echo <<<EOT
+        <script>
+            $(function() {
+                setTimeout(function() {
+                    $.get('/plugins/netbird/include/data/Dashboard.php', function(data) {
+                        $('tbody[title="Netbird"]').replaceWith(data);
+                    });
+                }, 5000);
             });
         </script>
         EOT;
