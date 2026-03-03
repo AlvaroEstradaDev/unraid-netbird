@@ -53,14 +53,14 @@ try {
                 $netbirdStatusInfo = $netbirdInfo->getStatusInfo();
                 $netbirdConInfo    = $netbirdInfo->getConnectionInfo();
 
-                $acceptDNSButton    = $netbirdInfo->acceptsDNS() 
-                    ? "<input type='button' value='{$tr->tr("remove")}' onclick='toggleSetting(\"accept_dns\", false)'>" 
+                $acceptDNSButton = $netbirdInfo->acceptsDNS()
+                    ? "<input type='button' value='{$tr->tr("remove")}' onclick='toggleSetting(\"accept_dns\", false)'>"
                     : "<input type='button' value='{$tr->tr("enable")}' onclick='toggleSetting(\"accept_dns\", true)'>";
-                $acceptRoutesButton = $netbirdInfo->acceptsRoutes() 
-                    ? "<input type='button' value='{$tr->tr("remove")}' onclick='toggleSetting(\"accept_routes\", false)'>" 
+                $acceptRoutesButton = $netbirdInfo->acceptsRoutes()
+                    ? "<input type='button' value='{$tr->tr("remove")}' onclick='toggleSetting(\"accept_routes\", false)'>"
                     : "<input type='button' value='{$tr->tr("enable")}' onclick='toggleSetting(\"accept_routes\", true)'>";
-                $sshButton          = $netbirdInfo->runsSSH() 
-                    ? "<input type='button' value='{$tr->tr("remove")}' onclick='toggleSetting(\"ssh\", false)'>" 
+                $sshButton = $netbirdInfo->runsSSH()
+                    ? "<input type='button' value='{$tr->tr("remove")}' onclick='toggleSetting(\"ssh\", false)'>"
                     : "<input type='button' value='{$tr->tr("enable")}' onclick='toggleSetting(\"ssh\", true)'>";
 
                 $connectionRows = <<<EOT
@@ -167,32 +167,32 @@ try {
             break;
         case 'toggle':
             $setting = $_POST['setting'] ?? '';
-            $value   = $_POST['value'] ?? '';
-            
+            $value   = $_POST['value']   ?? '';
+
             $configFile = '/boot/config/plugins/netbird/netbird.cfg';
-            $config     = file_exists($configFile) ? parse_ini_file($configFile) : [];
-            
+            $config     = file_exists($configFile) ? (parse_ini_file($configFile) ?: []) : [];
+
             $settingMap = [
                 'accept_dns'    => 'ACCEPT_DNS',
                 'accept_routes' => 'ACCEPT_ROUTES',
                 'ssh'           => 'SSH'
             ];
-            
+
             if (isset($settingMap[$setting])) {
                 $configKey          = $settingMap[$setting];
                 $config[$configKey] = $value ? '1' : '0';
-                
+
                 $content = '';
                 foreach ($config as $key => $val) {
                     $content .= "{$key}=\"{$val}\"\n";
                 }
                 file_put_contents($configFile, $content);
-                
+
                 $newConfig = new Config();
                 System::createNetbirdParamsFile($newConfig);
-                
+
                 Utils::runwrap('/usr/local/emhttp/plugins/netbird/restart.sh');
-                
+
                 echo json_encode(['success' => true]);
             } else {
                 echo json_encode(['success' => false, 'error' => 'Invalid setting']);
