@@ -55,9 +55,7 @@ class LocalAPI
         }
         try {
             $status = $this->getStatus();
-            if (isset($status->Self->Online) && $status->Self->Online) {
-                return true;
-            }
+            return isset($status->Self);
         } catch (\RuntimeException $e) {
             // No need to log here, as this is just a readiness check
         }
@@ -70,7 +68,7 @@ class LocalAPI
             return new \stdClass();
         }
         try {
-            $output = Utils::runwrap('netbird status --json 2>/dev/null', false, false);
+            $output = Utils::runwrap('timeout 5 netbird status --json 2>/dev/null', false, false);
             $raw    = $this->decodeJSONResponse(implode("\n", $output));
 
             // Map Netbird JSON to expected format
@@ -123,7 +121,7 @@ class LocalAPI
             return [];
         }
         try {
-            $output = Utils::runwrap('netbird routes list 2>/dev/null', false, false);
+            $output = Utils::runwrap('timeout 5 netbird routes list 2>/dev/null', false, false);
             $routes = [];
 
             foreach ($output as $line) {
@@ -154,7 +152,7 @@ class LocalAPI
                 unlink('/tmp/netbird-login.log');
             }
             // Run netbird up in background and capture output
-            Utils::runwrap('nohup netbird up --no-browser > /tmp/netbird-login.log 2>&1 &', false, false);
+            Utils::runwrap('nohup timeout 30 netbird up --no-browser > /tmp/netbird-login.log 2>&1 &', false, false);
         } catch (\RuntimeException $e) {
             Utils::logwrap("Failed to post login interactive: " . $e->getMessage());
         }
@@ -170,7 +168,7 @@ class LocalAPI
             $escapedUrl      = escapeshellarg($managementUrl);
             $escapedSetupKey = escapeshellarg($setupKey);
 
-            $command = "nohup netbird up --management-url {$escapedUrl} --setup-key {$escapedSetupKey} > /tmp/netbird-login.log 2>&1 &";
+            $command = "nohup timeout 30 netbird up --management-url {$escapedUrl} --setup-key {$escapedSetupKey} > /tmp/netbird-login.log 2>&1 &";
             Utils::runwrap($command, false, false);
 
             return true;
