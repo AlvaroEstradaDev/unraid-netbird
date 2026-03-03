@@ -47,25 +47,26 @@ try {
             $routers = filter_var($_POST['routers'] ?? false, FILTER_VALIDATE_BOOLEAN);
 
             foreach ($netbirdInfo->getPeerStatus() as $peer) {
+                /** @var PeerStatus $peer */
                 // Hide offline peers unless filter is enabled
-                if (!$peer->Online && !$offline) {
+                if ( ! $peer->Online && ! $offline) {
                     continue;
                 }
                 // Hide inactive network routers unless filter is enabled
-                if (!empty($peer->Networks) && !$peer->Active && !$routers) {
+                if ( ! empty($peer->Networks) && ! $peer->Active && ! $routers) {
                     continue;
                 }
 
                 $user       = $peer->Name;
                 $online     = $peer->Online ? ($peer->Active ? $tr->tr('status_page.active') : $tr->tr('status_page.idle')) : $tr->tr('status_page.offline');
-                $networks   = !empty($peer->Networks) ? implode("<br>", $peer->Networks) : "";
+                $networks   = ! empty($peer->Networks) ? implode("<br>", $peer->Networks) : "";
                 $connection = $peer->Active ? ($peer->Relayed ? $tr->tr('status_page.relay') : $tr->tr('status_page.direct')) : "";
                 $active     = $peer->Active ? $peer->Address : "";
                 $txBytes    = $peer->Traffic ? $peer->TxBytes : "";
                 $rxBytes    = $peer->Traffic ? $peer->RxBytes : "";
-                $pingHost   = (!$peer->Online) ? "" : "<input type='button' class='ping' value='{$tr->tr('ping')}' onclick='pingHost(\"{$peer->Name}\")'>";
-                $sshBtn     = (!$peer->Online) ? "" : "<input type='button' class='ssh' value='{$tr->tr('ssh')}' onclick='sshPeer(\"{$peer->Name}\")'>";
-                
+                $pingHost   = ( ! $peer->Online) ? "" : "<input type='button' class='ping' value='{$tr->tr('ping')}' onclick='pingHost(\"{$peer->Name}\")'>";
+                $sshBtn     = ( ! $peer->Online) ? "" : "<input type='button' class='ssh' value='{$tr->tr('ssh')}' onclick='sshPeer(\"{$peer->Name}\")'>";
+
                 // Build IP column with copy buttons
                 $ipColumn = "";
                 foreach ($peer->IP as $ip) {

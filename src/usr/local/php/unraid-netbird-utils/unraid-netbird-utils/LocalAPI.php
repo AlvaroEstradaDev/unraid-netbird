@@ -174,17 +174,17 @@ class LocalAPI
                     continue;
                 }
 
-                $p                 = new \stdClass();
-                $p->DNSName        = $peer->fqdn ?? '';
-                $p->NetbirdIPs     = isset($peer->netbirdIp) ? [$peer->netbirdIp] : [];
-                $p->Online         = ($peer->status ?? '') === "Connected";
-                $p->Active         = $p->Online;
-                $p->Relay          = "";
-                $p->CurAddr        = "";
-                $p->TxBytes        = $peer->transferSent     ?? 0;
-                $p->RxBytes        = $peer->transferReceived ?? 0;
-                $p->Tags           = [];
-                $p->Networks       = $peer->networks ?? [];
+                $p             = new \stdClass();
+                $p->DNSName    = $peer->fqdn ?? '';
+                $p->NetbirdIPs = isset($peer->netbirdIp) ? [$peer->netbirdIp] : [];
+                $p->Online     = ($peer->status ?? '') === "Connected";
+                $p->Active     = $p->Online;
+                $p->Relay      = "";
+                $p->CurAddr    = "";
+                $p->TxBytes    = $peer->transferSent     ?? 0;
+                $p->RxBytes    = $peer->transferReceived ?? 0;
+                $p->Tags       = [];
+                $p->Networks   = $peer->networks ?? [];
 
                 if (isset($peer->relayAddress) && isset($peer->connectionType) && $peer->connectionType === "Relayed") {
                     $p->Relay = $peer->relayAddress;
