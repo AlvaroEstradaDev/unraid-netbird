@@ -47,13 +47,10 @@ class System extends \EDACerton\PluginUtils\System
             Utils::logwrap("Self DNSName or NetbirdIPs not found, skipping self addition to hosts file.");
         }
 
-        // Add all peers to /etc/hosts, except those with the tag 'tag:mullvad-exit-node'
+        // Add all peers to /etc/hosts
         if (isset($status->Peer) && is_object($status->Peer)) {
             foreach ((array) $status->Peer as $k => $peer) {
                 if ( ! ($peer instanceof \stdClass)) {
-                    continue;
-                }
-                if (isset($peer->Tags) && is_array($peer->Tags) && in_array('tag:mullvad-exit-node', $peer->Tags, true)) {
                     continue;
                 }
                 if (isset($peer->DNSName) && isset($peer->NetbirdIPs) && is_array($peer->NetbirdIPs)) {

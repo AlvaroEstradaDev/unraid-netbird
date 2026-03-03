@@ -15,6 +15,10 @@
     "login": "Iniciar sesión",
     "add": "Agregar",
     "remove": "Eliminar",
+    "ping": "Ping",
+    "ssh": "SSH",
+    "copy": "Copiar",
+    "copied": "Copiado",
     "configuration": "Configuración",
     "needs_login": "Este dispositivo necesita iniciar sesión en Netbird. Actualice esta página después de iniciar sesión para ver el estado.",
     "netbird_disabled": "Netbird está desactivada actualmente. Se puede activar a través de la pestaña de ajustes.",
@@ -83,20 +87,22 @@
         "tpm": "Activar el TPM vincula la clave de nodo de Netbird al hardware específico de este dispositivo. Si posteriormente se desactiva el TPM, la clave de nodo de Netbird dejará de ser válida y será necesario volver a autenticar el dispositivo con Netbird. También es posible que los TPM se bloqueen, lo que puede interrumpir la conectividad de Netbird y requerir una nueva autenticación."
     },
     "status_page": {
-        "exit_node": "Nodo de salida",
+        "networks": "Redes",
         "connection_type": "Tipo de conexión",
         "connection_addr": "Conexión",
         "tx_bytes": "Bytes Tx",
         "rx_bytes": "Bytes Rx",
         "relay": "Relevo",
         "direct": "Directo",
-        "exit_active": "Activo",
-        "exit_available": "Hay disponible",
         "idle": "Inactivo",
         "offline": "Desconectado",
         "active": "Activo",
         "login_name": "Nombre de usuario",
-        "shared": "Usuario compartido entrante",
-        "action": "Acción"
+        "action": "Acción",
+        "show_offline": "Mostrar pares desconectados",
+        "show_routers": "Mostrar enrutadores de red",
+        "ssh_prompt": "Ingrese nombre de usuario SSH (dejar vacío para predeterminado):",
+        "ssh_copied": "¡Comando SSH copiado!",
+        "ssh_instruction": "Pegue en la terminal para conectar."
     }
 }

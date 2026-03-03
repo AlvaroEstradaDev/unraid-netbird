@@ -43,39 +43,48 @@ try {
             $netbirdInfo = $netbirdInfo ?? new Info($tr);
             $rows        = "";
 
-            $mullvad = filter_var($_POST['mullvad'] ?? false, FILTER_VALIDATE_BOOLEAN);
-            $shared  = filter_var($_POST['shared'] ?? false, FILTER_VALIDATE_BOOLEAN);
+            $offline = filter_var($_POST['offline'] ?? false, FILTER_VALIDATE_BOOLEAN);
+            $routers = filter_var($_POST['routers'] ?? false, FILTER_VALIDATE_BOOLEAN);
 
             foreach ($netbirdInfo->getPeerStatus() as $peer) {
-                if ($peer->Mullvad && ! $mullvad && ! $peer->Active) {
+                // Hide offline peers unless filter is enabled
+                if (!$peer->Online && !$offline) {
                     continue;
                 }
-                if ($peer->SharedUser && ! $shared && ! $peer->Active) {
+                // Hide inactive network routers unless filter is enabled
+                if (!empty($peer->Networks) && !$peer->Active && !$routers) {
                     continue;
                 }
 
-                $user       = $peer->SharedUser ? $tr->tr('status_page.shared') : $peer->Name;
+                $user       = $peer->Name;
                 $online     = $peer->Online ? ($peer->Active ? $tr->tr('status_page.active') : $tr->tr('status_page.idle')) : $tr->tr('status_page.offline');
-                $exitNode   = $peer->ExitNodeActive ? $tr->tr('status_page.exit_active') : ($peer->ExitNodeAvailable ? ($peer->Mullvad ? "Mullvad" : $tr->tr('status_page.exit_available')) : "");
+                $networks   = !empty($peer->Networks) ? implode("<br>", $peer->Networks) : "";
                 $connection = $peer->Active ? ($peer->Relayed ? $tr->tr('status_page.relay') : $tr->tr('status_page.direct')) : "";
                 $active     = $peer->Active ? $peer->Address : "";
                 $txBytes    = $peer->Traffic ? $peer->TxBytes : "";
                 $rxBytes    = $peer->Traffic ? $peer->RxBytes : "";
-                $pingHost   = ($peer->SharedUser || $peer->Active || ! $peer->Online || $peer->Mullvad) ? "" : "<input type='button' class='ping' value='Ping' onclick='pingHost(\"{$peer->Name}\")'>";
-                $ips        = implode("<br>", $peer->IP);
+                $pingHost   = (!$peer->Online) ? "" : "<input type='button' class='ping' value='{$tr->tr('ping')}' onclick='pingHost(\"{$peer->Name}\")'>";
+                $sshBtn     = (!$peer->Online) ? "" : "<input type='button' class='ssh' value='{$tr->tr('ssh')}' onclick='sshPeer(\"{$peer->Name}\")'>";
+                
+                // Build IP column with copy buttons
+                $ipColumn = "";
+                foreach ($peer->IP as $ip) {
+                    $ipColumn .= "<span style='white-space: nowrap;'>{$ip} <input type='button' class='copy-ip' value='📋' title='{$tr->tr('copy')}' onclick='copyIP(\"{$ip}\")' style='padding: 0 4px; font-size: 10px;'></span><br>";
+                }
+                $ipColumn = rtrim($ipColumn, "<br>");
 
                 $rows .= <<<EOT
                     <tr>
                         <td>{$user}</td>
-                        <td>{$ips}</td>
+                        <td>{$ipColumn}</td>
                         <td>{$peer->LoginName}</td>
                         <td>{$online}</td>
-                        <td>{$exitNode}</td>
+                        <td>{$networks}</td>
                         <td>{$connection}</td>
                         <td>{$active}</td>
                         <td>{$txBytes}</td>
                         <td>{$rxBytes}</td>
-                        <td>{$pingHost}</td>
+                        <td>{$pingHost} {$sshBtn}</td>
                     </tr>
                     EOT;
             }
@@ -88,7 +97,7 @@ try {
                             <th>{$tr->tr('info.ip')}</th>
                             <th>{$tr->tr('status_page.login_name')}</th>
                             <th class="filter-select filter-match" id="status">{$tr->tr('status')}</th>
-                            <th class="filter-select filter-match" id="exitnode">{$tr->tr('status_page.exit_node')}</th>
+                            <th class="filter-false">{$tr->tr('status_page.networks')}</th>
                             <th class="filter-select filter-match" id="conntype">{$tr->tr('status_page.connection_type')}</th>
                             <th class="filter-false">{$tr->tr('status_page.connection_addr')}</th>
                             <th class="filter-false">{$tr->tr('status_page.tx_bytes')}</th>
