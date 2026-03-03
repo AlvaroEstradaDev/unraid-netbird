@@ -4,7 +4,7 @@
 <PLUGIN 
   name="netbird"
   author="Alvaro Estrada"
-  version="2026.03.03.1621"
+  version="2026.03.03.1635"
   launch="Settings/Netbird"
   pluginURL="https://raw.githubusercontent.com/AlvaroEstradaDev/unraid-netbird/preview/plugin/netbird-preview.plg"
   support="https://forums.unraid.net/topic/"
@@ -15,6 +15,22 @@
 
 <CHANGES>
 <![CDATA[
+
+### 2026.03.03.1635
+
+### 🐛 Bug Fixes
+
+- fix: remove all invalid CLI flags, use config.json for all settings (#11)
+
+ ALL CLI flags (`--allow-server-ssh`, `--wireguard-port`, `--accept-dns`, `--accept-routes`) are invalid for `netbird service run` and were crashing the daemon. All settings now go directly to netbird's `config.json` file:
+ - `DisableDNS` (inverted from AllowDNS)
+ - `DisableClientRoutes` (inverted from AllowRoutes)
+ - `ServerSSHAllowed`
+ - `WgPort`
+
+- fix: check socket availability before running netbird commands (#8)
+
+ When the netbird daemon is not running, netbird CLI commands block waiting for the socket timeout (30+ seconds). Multiple PHP processes spawning and blocking caused CPU exhaustion. Added socket availability check to return early.
 
 ### 2026.03.03.1621
 
@@ -39,14 +55,6 @@
 - check socket availability before running netbird commands (#8)
 
  When the netbird daemon is not running, netbird CLI commands block waiting for the socket timeout (30+ seconds). Multiple PHP processes spawning and blocking caused CPU exhaustion. Added socket availability check to return early.
-
-### 2026.03.03.0438
-
-### 🐛 Bug Fixes
-
-- add missing --accept-dns and --accept-routes flags to netbird startup (#7)
-
-The toggle buttons for Accept DNS and Accept Routes saved the config but never passed the corresponding CLI flags to netbird service run, causing the daemon to fail when these options were enabled.
 
 
 For older releases, see https://github.com/AlvaroEstradaDev/unraid-netbird/releases
@@ -90,9 +98,9 @@ if ($oldPlugin !== "") {
 <SHA256>10196c855c4ebd849e54325dde3b8727bc91c070b75a7abf9325326c0a7c72f6</SHA256>
 </FILE>
 
-<FILE Name="/boot/config/plugins/netbird/unraid-netbird-utils-2026.03.03.1621-noarch-1.txz">
-<URL>https://github.com/AlvaroEstradaDev/unraid-netbird/releases/download/2026.03.03.1621/unraid-netbird-utils-2026.03.03.1621-noarch-1.txz</URL>
-<SHA256>b8eb331859e61ad5dbe73835815136b0a0fb1f29af24bd20ff60fb45f1e76f78</SHA256>
+<FILE Name="/boot/config/plugins/netbird/unraid-netbird-utils-2026.03.03.1635-noarch-1.txz">
+<URL>https://github.com/AlvaroEstradaDev/unraid-netbird/releases/download/2026.03.03.1635/unraid-netbird-utils-2026.03.03.1635-noarch-1.txz</URL>
+<SHA256>ccd81b49b005419aeff2fce5883e7bbea56d850ad2a7347b87c44a7e04286e34</SHA256>
 </FILE>
 
 <!--
@@ -110,7 +118,7 @@ if [ -L "/etc/rc.d/rc.netbird" ]; then
     rm -f /etc/rc.d/rc.netbird
 fi
 
-upgradepkg --install-new /boot/config/plugins/netbird/unraid-netbird-utils-2026.03.03.1621-noarch-1.txz
+upgradepkg --install-new /boot/config/plugins/netbird/unraid-netbird-utils-2026.03.03.1635-noarch-1.txz
 
 mkdir -p /usr/local/emhttp/plugins/netbird/bin
 tar xzf /boot/config/plugins/netbird/0.66.0.tar.gz -C /usr/local/emhttp/plugins/netbird/bin netbird
@@ -137,7 +145,7 @@ sed -i "s/Netbird\*\*/Netbird (Preview)**/" /usr/local/emhttp/plugins/netbird/RE
 netbird completion bash > /etc/bash_completion.d/netbird
 
 # cleanup old versions
-rm -f $(ls /boot/config/plugins/netbird/unraid-netbird-utils-*.txz 2>/dev/null | grep -v '2026.03.03.1621')
+rm -f $(ls /boot/config/plugins/netbird/unraid-netbird-utils-*.txz 2>/dev/null | grep -v '2026.03.03.1635')
 rm -f $(ls /boot/config/plugins/netbird/*.tar.gz 2>/dev/null | grep -v '0.66.0')
 
 # check to see if the state file has been backed up to Unraid Connect
@@ -161,7 +169,7 @@ fi
 echo ""
 echo "----------------------------------------------------"
 echo " netbird has been installed."
-echo " Version: 2026.03.03.1621"
+echo " Version: 2026.03.03.1635"
 echo "----------------------------------------------------"
 echo ""
 ]]>
