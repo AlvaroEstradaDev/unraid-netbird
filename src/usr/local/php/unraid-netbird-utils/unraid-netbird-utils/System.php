@@ -247,20 +247,46 @@ class System extends \EDACerton\PluginUtils\System
         }
     }
 
+    public static function updateNetbirdConfig(Config $config): void
+    {
+        $configFile = '/boot/config/plugins/netbird/config.json';
+
+        if ( ! file_exists($configFile)) {
+            Utils::logwrap("Netbird config.json not found, skipping update");
+            return;
+        }
+
+        $content = file_get_contents($configFile);
+        if ($content === false) {
+            Utils::logwrap("Failed to read netbird config.json");
+            return;
+        }
+
+        $json = json_decode($content, true);
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            Utils::logwrap("Failed to parse netbird config.json: " . json_last_error_msg());
+            return;
+        }
+
+        $json['DisableDNS'] = ! $config->AllowDNS;
+        $json['DisableClientRoutes'] = ! $config->AllowRoutes;
+
+        $newContent = json_encode($json, JSON_PRETTY_PRINT);
+        if ($newContent === false) {
+            Utils::logwrap("Failed to encode netbird config.json");
+            return;
+        }
+
+        file_put_contents($configFile, $newContent);
+        Utils::logwrap("Updated netbird config.json: DisableDNS=" . ($json['DisableDNS'] ? 'true' : 'false') . ", DisableClientRoutes=" . ($json['DisableClientRoutes'] ? 'true' : 'false'));
+    }
+
     public static function createNetbirdParamsFile(Config $config): void
     {
         $custom_params = "";
 
         if ($config->SSH) {
             $custom_params .= " --allow-server-ssh";
-        }
-
-        if ($config->AllowDNS) {
-            $custom_params .= " --accept-dns";
-        }
-
-        if ($config->AllowRoutes) {
-            $custom_params .= " --accept-routes";
         }
 
         if ($config->WgPort > 0 && $config->WgPort <= 65535) {
