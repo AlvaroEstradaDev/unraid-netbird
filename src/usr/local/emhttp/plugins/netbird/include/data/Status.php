@@ -123,7 +123,7 @@ try {
             foreach ($netbirdInfo->getPeerStatus() as $peer) {
                 if ($peer->Name == $_POST['host']) {
                     $peerIP = escapeshellarg($peer->IP[0]);
-                    $out    = implode("<br>", $utils->run_command("netbird ping {$peerIP}"));
+                    $out    = implode("<br>", $utils->run_command("ping -c 3 -w 5 {$peerIP}"));
                     break;
                 }
             }
