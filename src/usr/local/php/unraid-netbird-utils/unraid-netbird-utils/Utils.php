@@ -71,6 +71,14 @@ class Utils extends \EDACerton\PluginUtils\Utils
         if ( ! defined(__NAMESPACE__ . "\PLUGIN_NAME")) {
             throw new \RuntimeException("PLUGIN_NAME is not defined.");
         }
+
+        // Log rotation - keep logs under 1MB
+        $logFile = "/var/log/" . PLUGIN_NAME . ".log";
+        if (file_exists($logFile) && filesize($logFile) > 1048576) {
+            $backup = $logFile . ".old";
+            @rename($logFile, $backup);
+        }
+
         $utils = new Utils(PLUGIN_NAME);
         $utils->logmsg($message, $debug, $rateLimit);
     }

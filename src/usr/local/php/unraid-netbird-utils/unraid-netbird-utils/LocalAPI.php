@@ -55,6 +55,15 @@ class LocalAPI
         return $this->isDaemonRunning() && $this->isSocketAvailable();
     }
 
+    public function hasIP(): bool
+    {
+        $interfaces = @net_get_interfaces();
+        if ( ! is_array($interfaces)) {
+            return false;
+        }
+        return isset($interfaces["netbird1"]["unicast"]);
+    }
+
     private function decodeJSONResponse(string $response): \stdClass
     {
         if (empty(trim($response))) {

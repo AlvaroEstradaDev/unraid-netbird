@@ -82,7 +82,7 @@ class Watcher
 
                 $utils->run_task('Netbird\System::fixLocalSubnetRoutes');
             } else {
-                $utils->logmsg("Waiting for Netbird IP");
+                $utils->logmsg("Waiting for Netbird IP", false, true);
             }
 
             sleep($timer);
