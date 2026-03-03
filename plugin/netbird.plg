@@ -4,7 +4,7 @@
 <PLUGIN 
   name="netbird"
   author="Alvaro Estrada"
-  version="2026.03.03.1905"
+  version="2026.03.03.1909"
   launch="Settings/Netbird"
   pluginURL="https://raw.githubusercontent.com/AlvaroEstradaDev/unraid-netbird/main/plugin/netbird.plg"
   support="https://forums.unraid.net/topic/"
@@ -15,6 +15,44 @@
 
 <CHANGES>
 <![CDATA[
+
+### 2026.03.03.1909
+
+## 🐛 Bug Fixes
+
+### fix: prevent dashboard crash with optimized LocalAPI (#15)
+
+The dashboard widget was crashing Unraid's main dashboard because `isReady()` was blocking for ~1.6 seconds while waiting for the netbird CLI to respond.
+
+#### Changes
+
+**LocalAPI.php optimizations:**
+- **Fast `isReady()`**: Now checks daemon process (`pgrep`) + socket file only (~17ms instead of ~1.6s)
+- **Status caching**: Results cached for 30 seconds in `/tmp/netbird-status-cache.json`
+- **Two-tier caching**: In-memory static cache + file cache for cross-process sharing
+- **Better error handling**: Never throws exceptions, returns empty objects on failure
+- **Cleaner code**: Direct `exec()` calls with return code checks
+
+**Dashboard.php improvements:**
+- Simplified readiness check (single `isReady()` call)
+- Added try-catch around `Info` object creation
+- Logs errors but gracefully shows "not ready" message
+
+#### Performance Results
+
+| Scenario | Before | After |
+|----------|--------|-------|
+| `isReady()` | ~1,600ms | ~17ms |
+| First `getStatus()` | ~1,600ms | ~1,500ms |
+| Cached `getStatus()` | ~1,600ms | ~16ms |
+| Dashboard load (cached) | ~1,600ms | ~40ms |
+
+#### Why This Prevents Crashes
+
+1. **`isReady()` is instant** - No CLI call, just checks process + socket
+2. **`getStatus()` is cached** - Only one CLI call per 30 seconds across all processes
+3. **File cache is shared** - Multiple PHP processes benefit from same cache
+4. **Graceful degradation** - Errors show "not ready" instead of crashing
 
 ### 2026.03.03.1905
 
@@ -38,22 +76,6 @@
  - Create new `Dashboard.php` AJAX endpoint for widget-only refresh
 
  This prevents the dashboard from crashing when the netbird daemon is unresponsive or in a transitional state. The settings page is not affected by auto-refresh, allowing users to enter login credentials without interruption.
-
-### 2026.03.03.1635
-
-### 🐛 Bug Fixes
-
-- fix: remove all invalid CLI flags, use config.json for all settings (#11)
-
- ALL CLI flags (`--allow-server-ssh`, `--wireguard-port`, `--accept-dns`, `--accept-routes`) are invalid for `netbird service run` and were crashing the daemon. All settings now go directly to netbird's `config.json` file:
- - `DisableDNS` (inverted from AllowDNS)
- - `DisableClientRoutes` (inverted from AllowRoutes)
- - `ServerSSHAllowed`
- - `WgPort`
-
-- fix: check socket availability before running netbird commands (#8)
-
- When the netbird daemon is not running, netbird CLI commands block waiting for the socket timeout (30+ seconds). Multiple PHP processes spawning and blocking caused CPU exhaustion. Added socket availability check to return early.
 
 
 For older releases, see https://github.com/AlvaroEstradaDev/unraid-netbird/releases
@@ -97,9 +119,9 @@ if ($oldPlugin !== "") {
 <SHA256>10196c855c4ebd849e54325dde3b8727bc91c070b75a7abf9325326c0a7c72f6</SHA256>
 </FILE>
 
-<FILE Name="/boot/config/plugins/netbird/unraid-netbird-utils-2026.03.03.1905-noarch-1.txz">
-<URL>https://github.com/AlvaroEstradaDev/unraid-netbird/releases/download/2026.03.03.1905/unraid-netbird-utils-2026.03.03.1905-noarch-1.txz</URL>
-<SHA256>4c9cc5c6976372cc7d3a665b79e11419d97faa40c1da2c355142f5ec3e5252ac</SHA256>
+<FILE Name="/boot/config/plugins/netbird/unraid-netbird-utils-2026.03.03.1909-noarch-1.txz">
+<URL>https://github.com/AlvaroEstradaDev/unraid-netbird/releases/download/2026.03.03.1909/unraid-netbird-utils-2026.03.03.1909-noarch-1.txz</URL>
+<SHA256>70cbc075b44110bdafe82a9c93d858c4214ec5905026b19a22be9125825c7aef</SHA256>
 </FILE>
 
 <!--
@@ -117,7 +139,7 @@ if [ -L "/etc/rc.d/rc.netbird" ]; then
     rm -f /etc/rc.d/rc.netbird
 fi
 
-upgradepkg --install-new /boot/config/plugins/netbird/unraid-netbird-utils-2026.03.03.1905-noarch-1.txz
+upgradepkg --install-new /boot/config/plugins/netbird/unraid-netbird-utils-2026.03.03.1909-noarch-1.txz
 
 mkdir -p /usr/local/emhttp/plugins/netbird/bin
 tar xzf /boot/config/plugins/netbird/0.66.0.tar.gz -C /usr/local/emhttp/plugins/netbird/bin netbird
@@ -142,7 +164,7 @@ rm -f /var/log/plugins/netbird-trunk.plg
 netbird completion bash > /etc/bash_completion.d/netbird
 
 # cleanup old versions
-rm -f $(ls /boot/config/plugins/netbird/unraid-netbird-utils-*.txz 2>/dev/null | grep -v '2026.03.03.1905')
+rm -f $(ls /boot/config/plugins/netbird/unraid-netbird-utils-*.txz 2>/dev/null | grep -v '2026.03.03.1909')
 rm -f $(ls /boot/config/plugins/netbird/*.tar.gz 2>/dev/null | grep -v '0.66.0')
 
 # check to see if the state file has been backed up to Unraid Connect
@@ -166,7 +188,7 @@ fi
 echo ""
 echo "----------------------------------------------------"
 echo " netbird has been installed."
-echo " Version: 2026.03.03.1905"
+echo " Version: 2026.03.03.1909"
 echo "----------------------------------------------------"
 echo ""
 ]]>
