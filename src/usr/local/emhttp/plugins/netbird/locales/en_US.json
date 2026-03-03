@@ -44,6 +44,8 @@
         "funnel": "Allow Netbird Funnel",
         "hosts": "Add Peers to /etc/hosts",
         "tpm": "Allow TPM to Encrypt Node Key",
+        "restarting": "Restarting Netbird...",
+        "restart_complete": "Restart complete",
         "context": {
             "management_url": "The URL of your Netbird management server. Leave empty to use the default (https://api.netbird.io:443).",
             "setup_key": "The setup key from your Netbird dashboard. Used to authenticate this device without browser-based login. The key is stored locally and can be cleared after initial connection.",
