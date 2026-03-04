@@ -4,7 +4,7 @@
 <PLUGIN 
   name="netbird"
   author="Alvaro Estrada"
-  version="2026.03.03.2334"
+  version="2026.03.03.2356"
   launch="Settings/Netbird"
   pluginURL="https://raw.githubusercontent.com/AlvaroEstradaDev/unraid-netbird/main/plugin/netbird.plg"
   support="https://forums.unraid.net/topic/"
@@ -15,6 +15,10 @@
 
 <CHANGES>
 <![CDATA[
+
+### 2026.03.03.2356
+
+* No changes
 
 ### 2026.03.03.2334
 
@@ -54,19 +58,6 @@
 * Update English and Spanish locales for new features
 
 **Full Changelog**: https://github.com/AlvaroEstradaDev/unraid-netbird/compare/2026.03.03.2223...2026.03.03.2323
-
-### 2026.03.03.2157
-
-### 🐛 Bug Fixes
-
-- fix: correct boolean parsing for toggle settings and add restart feedback ([#19](https://github.com/AlvaroEstradaDev/unraid-netbird/pull/19))
-
-This release fixes the toggle buttons (Accept Routes, Accept DNS, Netbird SSH) which were not working correctly. The issue was that the string "false" from jQuery was being treated as truthy in PHP.
-
-**Changes:**
-- Fixed boolean parsing using `filter_var(..., FILTER_VALIDATE_BOOLEAN)`
-- Added visual feedback during restart (spinner + status messages)
-- Increased timeout from 2s to 7s to account for restart delay
 
 
 For older releases, see https://github.com/AlvaroEstradaDev/unraid-netbird/releases
@@ -110,9 +101,9 @@ if ($oldPlugin !== "") {
 <SHA256>10196c855c4ebd849e54325dde3b8727bc91c070b75a7abf9325326c0a7c72f6</SHA256>
 </FILE>
 
-<FILE Name="/boot/config/plugins/netbird/unraid-netbird-utils-2026.03.03.2334-noarch-1.txz">
-<URL>https://github.com/AlvaroEstradaDev/unraid-netbird/releases/download/2026.03.03.2334/unraid-netbird-utils-2026.03.03.2334-noarch-1.txz</URL>
-<SHA256>fc0c815a1d044df16f1f18e6fdbaea25c977cc7c4d5f995199b39d44669a6725</SHA256>
+<FILE Name="/boot/config/plugins/netbird/unraid-netbird-utils-2026.03.03.2356-noarch-1.txz">
+<URL>https://github.com/AlvaroEstradaDev/unraid-netbird/releases/download/2026.03.03.2356/unraid-netbird-utils-2026.03.03.2356-noarch-1.txz</URL>
+<SHA256>d8a329bde18dc50c17335b16f61c8f4e130cedb79ca78dfeef4da14ae7284e5c</SHA256>
 </FILE>
 
 <!--
@@ -130,7 +121,7 @@ if [ -L "/etc/rc.d/rc.netbird" ]; then
     rm -f /etc/rc.d/rc.netbird
 fi
 
-upgradepkg --install-new /boot/config/plugins/netbird/unraid-netbird-utils-2026.03.03.2334-noarch-1.txz
+upgradepkg --install-new /boot/config/plugins/netbird/unraid-netbird-utils-2026.03.03.2356-noarch-1.txz
 
 mkdir -p /usr/local/emhttp/plugins/netbird/bin
 tar xzf /boot/config/plugins/netbird/0.66.0.tar.gz -C /usr/local/emhttp/plugins/netbird/bin netbird
@@ -155,7 +146,7 @@ rm -f /var/log/plugins/netbird-trunk.plg
 netbird completion bash > /etc/bash_completion.d/netbird
 
 # cleanup old versions
-rm -f $(ls /boot/config/plugins/netbird/unraid-netbird-utils-*.txz 2>/dev/null | grep -v '2026.03.03.2334')
+rm -f $(ls /boot/config/plugins/netbird/unraid-netbird-utils-*.txz 2>/dev/null | grep -v '2026.03.03.2356')
 rm -f $(ls /boot/config/plugins/netbird/*.tar.gz 2>/dev/null | grep -v '0.66.0')
 
 # check to see if the state file has been backed up to Unraid Connect
@@ -179,7 +170,7 @@ fi
 echo ""
 echo "----------------------------------------------------"
 echo " netbird has been installed."
-echo " Version: 2026.03.03.2334"
+echo " Version: 2026.03.03.2356"
 echo "----------------------------------------------------"
 echo ""
 ]]>
