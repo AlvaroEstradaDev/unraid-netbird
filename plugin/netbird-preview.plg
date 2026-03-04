@@ -4,7 +4,7 @@
 <PLUGIN 
   name="netbird"
   author="Alvaro Estrada"
-  version="2026.03.04.1918"
+  version="2026.03.04.1938"
   launch="Settings/Netbird"
   pluginURL="https://raw.githubusercontent.com/AlvaroEstradaDev/unraid-netbird/preview/plugin/netbird-preview.plg"
   support="https://forums.unraid.net/topic/"
@@ -16,6 +16,12 @@
 <CHANGES>
 <![CDATA[
 
+### 2026.03.04.1938
+
+### 🐛 Bug Fixes
+
+- fix: update netbird binary checksum to match 0.66.2 release ([#26](https://github.com/AlvaroEstradaDev/unraid-netbird/pull/26))
+
 ### 2026.03.04.1918
 
 ### 🐛 Bug Fixes
@@ -25,25 +31,6 @@
 ### 2026.03.03.2356
 
 * No changes
-
-### 2026.03.03.2334
-
-## What's Changed
-
-### 🐛 Bug Fixes
-* Replace `netbird ping` with regular `ping -c 3 -w 5` command (fixes #22)
- - Netbird CLI does not have a ping command (Tailscale-specific feature)
- - Regular ping works through the Netbird tunnel interface
-
-### 🚀 Features (from 2026.03.03.2323)
-* Replace Tailscale features with Netbird-native filters and actions (#21)
- - Replace "Display inactive Mullvad nodes" → "Display offline peers"
- - Replace "Display inactive shared-in nodes" → "Display network routers"
- - Replace "Exit Node" column with "Networks" column
- - Add SSH button with username prompt
- - Add per-IP copy buttons
-
-**Full Changelog**: https://github.com/AlvaroEstradaDev/unraid-netbird/compare/2026.03.03.2323...2026.03.03.2334
 
 
 For older releases, see https://github.com/AlvaroEstradaDev/unraid-netbird/releases
@@ -82,14 +69,14 @@ if ($oldPlugin !== "") {
 </INLINE>
 </FILE>
 
-<FILE Name="/boot/config/plugins/netbird/0.66.0.tar.gz">
-<URL>https://github.com/netbirdio/netbird/releases/download/v0.66.0/netbird_0.66.0_linux_amd64.tar.gz</URL>
-<SHA256>10196c855c4ebd849e54325dde3b8727bc91c070b75a7abf9325326c0a7c72f6</SHA256>
+<FILE Name="/boot/config/plugins/netbird/0.66.2.tar.gz">
+<URL>https://github.com/netbirdio/netbird/releases/download/v0.66.2/netbird_0.66.2_linux_amd64.tar.gz</URL>
+<SHA256>65e3e932cc4709347fd2edaff1f152bd99a116e9142fa3c75e40420374d1dc0c</SHA256>
 </FILE>
 
-<FILE Name="/boot/config/plugins/netbird/unraid-netbird-utils-2026.03.04.1918-noarch-1.txz">
-<URL>https://github.com/AlvaroEstradaDev/unraid-netbird/releases/download/2026.03.04.1918/unraid-netbird-utils-2026.03.04.1918-noarch-1.txz</URL>
-<SHA256>192c13ba33b9cc5cc6f3214d8ad115f951a7da10d7ec37c005e83a9be6401860</SHA256>
+<FILE Name="/boot/config/plugins/netbird/unraid-netbird-utils-2026.03.04.1938-noarch-1.txz">
+<URL>https://github.com/AlvaroEstradaDev/unraid-netbird/releases/download/2026.03.04.1938/unraid-netbird-utils-2026.03.04.1938-noarch-1.txz</URL>
+<SHA256>05276574667b45ca5e8fa011d47f63ab702ab8bd8d4e559c633b27aaec00dcec</SHA256>
 </FILE>
 
 <!--
@@ -107,10 +94,10 @@ if [ -L "/etc/rc.d/rc.netbird" ]; then
     rm -f /etc/rc.d/rc.netbird
 fi
 
-upgradepkg --install-new /boot/config/plugins/netbird/unraid-netbird-utils-2026.03.04.1918-noarch-1.txz
+upgradepkg --install-new /boot/config/plugins/netbird/unraid-netbird-utils-2026.03.04.1938-noarch-1.txz
 
 mkdir -p /usr/local/emhttp/plugins/netbird/bin
-tar xzf /boot/config/plugins/netbird/0.66.0.tar.gz -C /usr/local/emhttp/plugins/netbird/bin netbird
+tar xzf /boot/config/plugins/netbird/0.66.2.tar.gz -C /usr/local/emhttp/plugins/netbird/bin netbird
 
 echo "state" > /boot/config/plugins/netbird/.gitignore
 
@@ -134,8 +121,8 @@ sed -i "s/Netbird\*\*/Netbird (Preview)**/" /usr/local/emhttp/plugins/netbird/RE
 netbird completion bash > /etc/bash_completion.d/netbird
 
 # cleanup old versions
-rm -f $(ls /boot/config/plugins/netbird/unraid-netbird-utils-*.txz 2>/dev/null | grep -v '2026.03.04.1918')
-rm -f $(ls /boot/config/plugins/netbird/*.tar.gz 2>/dev/null | grep -v '0.66.0')
+rm -f $(ls /boot/config/plugins/netbird/unraid-netbird-utils-*.txz 2>/dev/null | grep -v '2026.03.04.1938')
+rm -f $(ls /boot/config/plugins/netbird/*.tar.gz 2>/dev/null | grep -v '0.66.2')
 
 # check to see if the state file has been backed up to Unraid Connect
 if [ -d "/boot/.git" ]; then
@@ -158,7 +145,7 @@ fi
 echo ""
 echo "----------------------------------------------------"
 echo " netbird has been installed."
-echo " Version: 2026.03.04.1918"
+echo " Version: 2026.03.04.1938"
 echo "----------------------------------------------------"
 echo ""
 ]]>
