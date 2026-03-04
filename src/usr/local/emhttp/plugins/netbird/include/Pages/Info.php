@@ -44,12 +44,8 @@ $netbirdStatusInfo = $netbirdInfo->getStatusInfo();
     <tbody>
         <?php
         echo Utils::printRow($tr->tr("info.version"), $netbirdStatusInfo->TsVersion);
-echo Utils::printRow($tr->tr("info.health"), $netbirdStatusInfo->TsHealth);
 echo Utils::printRow($tr->tr("info.login"), $netbirdStatusInfo->LoggedIn);
-echo Utils::printRow($tr->tr("info.netmap"), $netbirdStatusInfo->InNetMap);
 echo Utils::printRow($tr->tr("info.online"), $netbirdStatusInfo->Online);
-echo Utils::printRow($tr->tr("info.key_expire"), $netbirdStatusInfo->KeyExpiration);
-echo Utils::printRow($tr->tr("info.tags"), $netbirdStatusInfo->Tags);
 echo Utils::printRow($tr->tr("info.connected_via"), $netbirdInfo->connectedViaTS() ? $tr->tr("yes") : $tr->tr("no"));
 ?>
     </tbody>
