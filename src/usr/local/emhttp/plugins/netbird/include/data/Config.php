@@ -59,9 +59,6 @@ try {
                 $acceptRoutesButton = $netbirdInfo->acceptsRoutes()
                     ? "<input type='button' value='{$tr->tr("remove")}' onclick='toggleSetting(\"accept_routes\", false)'>"
                     : "<input type='button' value='{$tr->tr("enable")}' onclick='toggleSetting(\"accept_routes\", true)'>";
-                $sshButton = $netbirdInfo->runsSSH()
-                    ? "<input type='button' value='{$tr->tr("remove")}' onclick='toggleSetting(\"ssh\", false)'>"
-                    : "<input type='button' value='{$tr->tr("enable")}' onclick='toggleSetting(\"ssh\", true)'>";
 
                 $connectionRows = <<<EOT
                     <tr><td>{$tr->tr("info.hostname")}</td><td>{$netbirdConInfo->HostName}</td><td></td></tr>
@@ -72,7 +69,7 @@ try {
                 $configRows = <<<EOT
                     <tr><td>{$tr->tr("info.accept_routes")}</td><td>{$netbirdConInfo->AcceptRoutes}</td><td style="text-align: right;">{$acceptRoutesButton}</td></tr>
                     <tr><td>{$tr->tr("info.accept_dns")}</td><td>{$netbirdConInfo->AcceptDNS}</td><td style="text-align: right;">{$acceptDNSButton}</td></tr>
-                    <tr><td>{$tr->tr("info.run_ssh")}</td><td>{$netbirdConInfo->RunSSH}</td><td style="text-align: right;">{$sshButton}</td></tr>
+
                     EOT;
 
                 $routesRows = "";
@@ -174,8 +171,7 @@ try {
 
             $settingMap = [
                 'accept_dns'    => 'ACCEPT_DNS',
-                'accept_routes' => 'ACCEPT_ROUTES',
-                'ssh'           => 'SSH'
+                'accept_routes' => 'ACCEPT_ROUTES'
             ];
 
             if (isset($settingMap[$setting])) {
