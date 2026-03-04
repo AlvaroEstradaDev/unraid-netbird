@@ -21,11 +21,7 @@ namespace Netbird;
 
 class StatusInfo
 {
-    public string $TsVersion     = "";
-    public string $KeyExpiration = "";
-    public string $Online        = "";
-    public string $InNetMap      = "";
-    public string $Tags          = "";
-    public string $LoggedIn      = "";
-    public string $TsHealth      = "";
+    public string $TsVersion = "";
+    public string $Online    = "";
+    public string $LoggedIn  = "";
 }

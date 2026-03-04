@@ -72,13 +72,9 @@ class Info
 
         $statusInfo = new StatusInfo();
 
-        $statusInfo->TsVersion     = isset($status->Version) ? $status->Version : $this->tr("unknown");
-        $statusInfo->KeyExpiration = isset($status->Self->KeyExpiry) ? $status->Self->KeyExpiry : $this->tr("disabled");
-        $statusInfo->Online        = isset($status->Self->Online) ? ($status->Self->Online ? $this->tr("yes") : $this->tr("no")) : $this->tr("unknown");
-        $statusInfo->InNetMap      = isset($status->Self->InNetworkMap) ? ($status->Self->InNetworkMap ? $this->tr("yes") : $this->tr("no")) : $this->tr("unknown");
-        $statusInfo->Tags          = isset($status->Self->Tags) ? implode("<br>", $status->Self->Tags) : "";
-        $statusInfo->LoggedIn      = $this->isOnline() ? $this->tr("yes") : $this->tr("no");
-        $statusInfo->TsHealth      = isset($status->Health) ? implode("<br>", $status->Health) : "";
+        $statusInfo->TsVersion = isset($status->Version) ? $status->Version : $this->tr("unknown");
+        $statusInfo->Online    = isset($status->Self->Online) ? ($status->Self->Online ? $this->tr("yes") : $this->tr("no")) : $this->tr("unknown");
+        $statusInfo->LoggedIn  = $this->isOnline() ? $this->tr("yes") : $this->tr("no");
 
         return $statusInfo;
     }
@@ -111,37 +107,6 @@ class Info
         $info->Online     = isset($status->Self->Online) ? ($status->Self->Online ? $this->tr("yes") : $this->tr("no")) : $this->tr("unknown");
 
         return $info;
-    }
-
-    public function getKeyExpirationWarning(): ?Warning
-    {
-        $status = $this->status;
-
-        if (isset($status->Self->KeyExpiry)) {
-            $expiryTime = new \DateTime($status->Self->KeyExpiry);
-            $expiryTime->setTimezone(new \DateTimeZone(date_default_timezone_get()));
-
-            $interval      = $expiryTime->diff(new \DateTime('now'));
-            $expiryPrint   = $expiryTime->format(\DateTimeInterface::RFC7231);
-            $intervalPrint = $interval->format('%a');
-
-            $warning = new Warning(sprintf($this->tr("warnings.key_expiration"), $intervalPrint, $expiryPrint));
-
-            switch (true) {
-                case $interval->days <= 7:
-                    $warning->Priority = 'error';
-                    break;
-                case $interval->days <= 30:
-                    $warning->Priority = 'warn';
-                    break;
-                default:
-                    $warning->Priority = 'system';
-                    break;
-            }
-
-            return $warning;
-        }
-        return null;
     }
 
     public function getNetbirdNetbiosWarning(): ?Warning
