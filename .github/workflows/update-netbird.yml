@@ -54,33 +54,70 @@ jobs:
           echo "full_version=$new_version" >> "$GITHUB_OUTPUT"
           echo "sha=$new_sha" >> "$GITHUB_OUTPUT"
 
-      - name: Commit and push branch
+      - name: Commit and push changes
         id: commit
         if: steps.compare.outputs.update == 'true'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git checkout -B chore/netbird-update
           git add plugin/plugin.json
           if git commit -m "chore: update Netbird to ${{ steps.compare.outputs.latest }}"; then
-            git push --force origin chore/netbird-update
+            git push origin HEAD:refs/heads/main
             echo "made=true" >> "$GITHUB_OUTPUT"
           else
             echo "No changes to commit."
             echo "made=false" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Create or update PR
+      - name: Wait for CI to pass
         if: steps.compare.outputs.update == 'true' && steps.commit.outputs.made == 'true'
         env:
           GH_TOKEN: ${{ secrets.GIT_TOKEN }}
         run: |
-          gh pr create \
-            --title "chore: update Netbird to ${{ steps.compare.outputs.latest }}" \
-            --body "Automated update via workflow." \
-            --head chore/netbird-update \
-            --base main \
-            --label chore \
-            || gh pr edit chore/netbird-update \
-              --title "chore: update Netbird to ${{ steps.compare.outputs.latest }}" \
-              --body "Automated update via workflow."
+          COMMIT_SHA=$(git rev-parse HEAD)
+          echo "Waiting for checks to pass on commit $COMMIT_SHA..."
+          
+          # Wait up to 10 minutes (30 * 20s)
+          for i in {1..30}; do
+            # Get the combined status of all workflow runs for the commit
+            # We filter out the current workflow run to avoid waiting for ourselves
+            RUNS_JSON=$(gh run list --commit $COMMIT_SHA --json name,conclusion,status)
+            
+            # If no runs found (e.g. tests haven't started yet), wait
+            # We also check if the only run is this workflow itself
+            RUN_COUNT=$(echo "$RUNS_JSON" | jq '[.[] | select(.name != "Netbird updater")] | length')
+            
+            if [ "$RUN_COUNT" -eq 0 ]; then
+              if [ "$i" -gt 5 ]; then
+                echo "No tests triggered for this commit after 100s. Assuming it's safe to proceed."
+                break
+              fi
+              echo "Waiting for tests to appear... (attempt $i/30)"
+              sleep 20
+              continue
+            fi
+            
+            CONCLUSION=$(echo "$RUNS_JSON" | jq -r '[.[] | select(.name != "Netbird updater")] | (map(select(.status == "completed" and .conclusion == "success")) | length) as $success_count | (map(select(.status == "completed" and (.conclusion == "failure" or .conclusion == "cancelled" or .conclusion == "timed_out" or .conclusion == "action_required"))) | length) as $failure_count | if $failure_count > 0 then "failure" elif $success_count == length then "success" else "pending" end')
+            
+            if [ "$CONCLUSION" = "success" ]; then
+              echo "All checks passed!"
+              break
+            elif [ "$CONCLUSION" = "failure" ]; then
+              echo "Checks failed. Aborting release."
+              exit 1
+            fi
+            
+            echo "Checks still running... (attempt $i/30)"
+            sleep 20
+          done
+
+      - name: Create Release
+        if: steps.compare.outputs.update == 'true' && steps.commit.outputs.made == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GIT_TOKEN }}
+        run: |
+          VERSION=$(TZ=UTC date +'%Y.%m.%d.%H%M')
+          gh release create "$VERSION" \
+            --title "$VERSION" \
+            --notes "Automated update of Netbird to version ${{ steps.compare.outputs.latest }}." \
+            --target main
