@@ -18,7 +18,7 @@ start_netbird() {
         NETBIRD_CUSTOM_PARAMS=""
     fi
 
-    NETBIRD_START_CMD="/usr/local/sbin/netbird service run -c /boot/config/plugins/netbird/config.json $NETBIRD_CUSTOM_PARAMS"
+    NETBIRD_START_CMD="/usr/local/sbin/netbird service run -c /boot/config/plugins/netbird/config.json --interface-name netbird1 $NETBIRD_CUSTOM_PARAMS"
     log "Starting netbird: $NETBIRD_START_CMD"
     mkdir -p /boot/config/plugins/netbird
     $NETBIRD_START_CMD 2>&1 >> /var/log/netbird.log &
