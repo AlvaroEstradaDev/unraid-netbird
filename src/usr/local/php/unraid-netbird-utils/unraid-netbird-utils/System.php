@@ -274,6 +274,8 @@ class System extends \EDACerton\PluginUtils\System
             $json['WgPort'] = $config->WgPort;
         }
 
+        $json['WgIface'] = 'netbird1';
+
         $newContent = json_encode($json, JSON_PRETTY_PRINT);
         if ($newContent === false) {
             Utils::logwrap("Failed to encode netbird config.json");
