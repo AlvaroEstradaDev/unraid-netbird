@@ -34,6 +34,7 @@ class Config
     public int $WgPort;
     public string $ManagementUrl;
     public string $SetupKey;
+    public string $InterfaceName;
 
     public function __construct()
     {
@@ -60,5 +61,6 @@ class Config
 
         $this->ManagementUrl = $saved_config["MANAGEMENT_URL"] ?? "";
         $this->SetupKey      = $saved_config["SETUP_KEY"]      ?? "";
+        $this->InterfaceName = $saved_config["INTERFACE_NAME"] ?? "netbird1";
     }
 }

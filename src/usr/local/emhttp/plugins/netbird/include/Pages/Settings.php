@@ -166,6 +166,15 @@ if ($netbirdConfig->Enable) {
             </dd>
         </dl>
         <blockquote class='inline_help'><?= $tr->tr("settings.context.wireguard"); ?></blockquote>
+
+        <dl>
+            <dt>Interface Name</dt>
+            <dd>
+                <input type="text" name="INTERFACE_NAME" class="narrow"
+                    value="<?= htmlspecialchars($netbirdConfig->InterfaceName); ?>" placeholder="netbird1">
+            </dd>
+        </dl>
+        <blockquote class='inline_help'>The name of the WireGuard interface created by Netbird (e.g., netbird1, wt0).</blockquote>
     </div>
 
     <table class="unraid tablesorter">
