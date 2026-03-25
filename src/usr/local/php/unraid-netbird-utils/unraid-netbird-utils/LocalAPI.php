@@ -253,7 +253,8 @@ class LocalAPI
         }
 
         $ifName  = escapeshellarg($this->config->InterfaceName);
-        $command = "nohup timeout 30 netbird up --interface-name {$ifName} --no-browser > /tmp/netbird-login.log 2>&1 &";
+        $ifPort  = escapeshellarg(strval($this->config->WgPort));
+        $command = "nohup timeout 30 netbird up --interface-name {$ifName} --wireguard-port {$ifPort} --no-browser > /tmp/netbird-login.log 2>&1 &";
         exec($command);
     }
 
@@ -267,9 +268,11 @@ class LocalAPI
         $escapedSetupKey = escapeshellarg($setupKey);
 
         $escapedIfName = escapeshellarg($this->config->InterfaceName);
+        $escapedIfPort = escapeshellarg(strval($this->config->WgPort));
         $command       = sprintf(
-            'nohup timeout 30 netbird up --interface-name %s --management-url %s --setup-key %s > /tmp/netbird-login.log 2>&1 &',
+            'nohup timeout 30 netbird up --interface-name %s --wireguard-port %s --management-url %s --setup-key %s > /tmp/netbird-login.log 2>&1 &',
             $escapedIfName,
+            $escapedIfPort,
             $escapedUrl,
             $escapedSetupKey
         );
