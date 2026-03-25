@@ -22,6 +22,7 @@ namespace Netbird;
 class LocalAPI
 {
     private Utils $utils;
+    private Config $config;
     private const SOCKET_PATH   = '/var/run/netbird.sock';
     private const CACHE_TTL     = 30;
     private const CACHE_FILE    = '/tmp/netbird-status-cache.json';
@@ -36,7 +37,8 @@ class LocalAPI
         if ( ! defined(__NAMESPACE__ . "\PLUGIN_ROOT") || ! defined(__NAMESPACE__ . "\PLUGIN_NAME")) {
             throw new \RuntimeException("Common file not loaded.");
         }
-        $this->utils = new Utils(PLUGIN_NAME);
+        $this->utils  = new Utils(PLUGIN_NAME);
+        $this->config = new Config();
     }
 
     public function isSocketAvailable(): bool
@@ -61,7 +63,7 @@ class LocalAPI
         if ( ! is_array($interfaces)) {
             return false;
         }
-        return isset($interfaces["netbird1"]["unicast"]);
+        return isset($interfaces[$this->config->InterfaceName]["unicast"]);
     }
 
     private function decodeJSONResponse(string $response): \stdClass
@@ -250,7 +252,8 @@ class LocalAPI
             unlink('/tmp/netbird-login.log');
         }
 
-        $command = 'nohup timeout 30 netbird up --no-browser > /tmp/netbird-login.log 2>&1 &';
+        $ifName  = escapeshellarg($this->config->InterfaceName);
+        $command = "nohup timeout 30 netbird up --interface-name {$ifName} --no-browser > /tmp/netbird-login.log 2>&1 &";
         exec($command);
     }
 
@@ -263,8 +266,10 @@ class LocalAPI
         $escapedUrl      = escapeshellarg($managementUrl);
         $escapedSetupKey = escapeshellarg($setupKey);
 
-        $command = sprintf(
-            'nohup timeout 30 netbird up --management-url %s --setup-key %s > /tmp/netbird-login.log 2>&1 &',
+        $escapedIfName = escapeshellarg($this->config->InterfaceName);
+        $command       = sprintf(
+            'nohup timeout 30 netbird up --interface-name %s --management-url %s --setup-key %s > /tmp/netbird-login.log 2>&1 &',
+            $escapedIfName,
             $escapedUrl,
             $escapedSetupKey
         );

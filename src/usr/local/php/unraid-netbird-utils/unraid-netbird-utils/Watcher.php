@@ -50,10 +50,11 @@ class Watcher
         while (true) {
             unset($netbird_ipv4);
 
-            $interfaces = net_get_interfaces();
+            $interfaces    = net_get_interfaces();
+            $interfaceName = $this->config->InterfaceName;
 
-            if (isset($interfaces["netbird1"]["unicast"])) {
-                foreach ($interfaces["netbird1"]["unicast"] as $interface) {
+            if (isset($interfaces[$interfaceName]["unicast"])) {
+                foreach ($interfaces[$interfaceName]["unicast"] as $interface) {
                     if (isset($interface["address"])) {
                         if ($interface["family"] == 2) {
                             $netbird_ipv4 = $interface["address"];
