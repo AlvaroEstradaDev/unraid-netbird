@@ -67,7 +67,8 @@ if ($netbirdConfig->Enable) {
         <dt><?= $tr->tr("settings.management_url"); ?></dt>
         <dd>
             <input type="text" name="MANAGEMENT_URL" class="narrow" autocomplete="off" spellcheck="false"
-                value="<?= htmlspecialchars($netbirdConfig->ManagementUrl); ?>" placeholder="https://api.netbird.io:443">
+                value="<?= htmlspecialchars($netbirdConfig->ManagementUrl); ?>"
+                placeholder="https://api.netbird.io:443">
         </dd>
     </dl>
     <blockquote class='inline_help'><?= $tr->tr("settings.context.management_url"); ?></blockquote>
@@ -162,7 +163,7 @@ if ($netbirdConfig->Enable) {
             <dt><?= $tr->tr("settings.wireguard"); ?></dt>
             <dd>
                 <input type="number" name="WG_PORT" class="narrow" min="0" max="65535"
-                    value="<?= $netbirdConfig->WgPort; ?>" placeholder="0">
+                    value="<?= $netbirdConfig->WgPort; ?>" placeholder="51820">
             </dd>
         </dl>
         <blockquote class='inline_help'><?= $tr->tr("settings.context.wireguard"); ?></blockquote>
@@ -174,7 +175,8 @@ if ($netbirdConfig->Enable) {
                     value="<?= htmlspecialchars($netbirdConfig->InterfaceName); ?>" placeholder="netbird1">
             </dd>
         </dl>
-        <blockquote class='inline_help'>The name of the WireGuard interface created by Netbird (e.g., netbird1, wt0).</blockquote>
+        <blockquote class='inline_help'>The name of the WireGuard interface created by Netbird (e.g., netbird1, wt0).
+        </blockquote>
     </div>
 
     <table class="unraid tablesorter">
@@ -431,7 +433,8 @@ if ($netbirdConfig->Enable) {
                     text: "<?= $tr->tr('settings.context.login_success'); ?>",
                     type: "success",
                     confirmButtonText: "<?= $tr->tr('accept'); ?>"
-                }, function() {
+                }, function ()
+                {
                     location.reload();
                 });
             }
