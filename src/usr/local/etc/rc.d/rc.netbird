@@ -30,6 +30,7 @@ stop_netbird() {
   log "Stopping netbird."
   killall --ns $$ --wait netbird-watcher.php 2> /dev/null
   killall --ns $$ --wait netbird 2> /dev/null
+  /usr/local/php/unraid-netbird-utils/post-stop.php 2>/dev/null
 }
 
 restart_netbird() {
