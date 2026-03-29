@@ -81,7 +81,7 @@ class Watcher
 
                 $allow_check_restart = $utils->run_task('Netbird\System::checkWebgui', array($this->config, $netbird_ipv4, $allow_check_restart));
 
-                $utils->run_task('Netbird\System::fixLocalSubnetRoutes');
+                $utils->run_task('Netbird\System::fixLocalSubnetRoutes', array($this->config));
             } else {
                 $utils->logmsg("Waiting for Netbird IP", false, true);
             }

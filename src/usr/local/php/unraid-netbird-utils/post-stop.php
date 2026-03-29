@@ -30,15 +30,4 @@ $utils = new Utils(PLUGIN_NAME);
 
 $netbirdConfig = $netbirdConfig ?? new Config();
 
-$utils->run_task('Netbird\System::createNetbirdParamsFile', array($netbirdConfig));
-$utils->run_task('Netbird\System::updateNetbirdConfig', array($netbirdConfig));
-$utils->run_task('Netbird\System::applyGRO');
-$utils->run_task('Netbird\System::setExtraInterface', array($netbirdConfig));
-$utils->run_task('Netbird\System::enableIPForwarding', array($netbirdConfig));
-$utils->run_task('Netbird\System::addFirewallRule', array($netbirdConfig));
-
-if ($netbirdConfig->Enable) {
-    exit(0);
-} else {
-    exit(1);
-}
+$utils->run_task('Netbird\System::removeFirewallRule', array($netbirdConfig));

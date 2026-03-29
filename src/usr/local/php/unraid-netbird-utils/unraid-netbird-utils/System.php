@@ -67,7 +67,7 @@ class System extends \EDACerton\PluginUtils\System
         }
     }
 
-    public static function fixLocalSubnetRoutes(): void
+    public static function fixLocalSubnetRoutes(Config $config): void
     {
         $ips = parse_ini_file("/boot/config/network.cfg") ?: array();
         if (array_key_exists(('IPADDR'), $ips)) {
@@ -80,7 +80,7 @@ class System extends \EDACerton\PluginUtils\System
                     $net = explode(' ', $route)[0];
                     if (Utils::ip4_in_network($ip, $net)) {
                         Utils::logwrap("Detected local IP {$ip} in Netbird route {$net}, removing");
-                        Utils::runwrap("ip route del '{$net}' dev netbird1 table 52");
+                        Utils::runwrap("ip route del '{$net}' dev {$config->InterfaceName} table 52");
                     }
                 }
             }
@@ -117,6 +117,61 @@ class System extends \EDACerton\PluginUtils\System
     {
         if ($config->IncludeInterface) {
             Utils::runwrap(self::RESTART_COMMAND);
+        }
+    }
+
+    public static function addFirewallRule(Config $config): void
+    {
+        if ($config->WgPort > 0 && $config->WgPort <= 65535) {
+            $port    = $config->WgPort;
+            $comment = "NetBird WireGuard";
+
+            // Check if the rule already exists
+            $check = Utils::runwrap(
+                "iptables -C INPUT -p udp --dport {$port} -m comment --comment " . escapeshellarg($comment) . " -j ACCEPT 2>&1",
+                false,
+                false
+            );
+
+            if ( ! empty($check)) {
+                Utils::logwrap("Adding firewall rule: ACCEPT UDP port {$port}");
+                Utils::runwrap(
+                    "iptables -I INPUT 1 -p udp --dport {$port} -m comment --comment " . escapeshellarg($comment) . " -j ACCEPT"
+                );
+            } else {
+                Utils::logwrap("Firewall rule for UDP port {$port} already exists", false, true);
+            }
+        }
+    }
+
+    public static function removeFirewallRule(Config $config): void
+    {
+        if ($config->WgPort > 0 && $config->WgPort <= 65535) {
+            $port    = $config->WgPort;
+            $comment = "NetBird WireGuard";
+
+            // Remove all matching rules
+            $removed = false;
+            while (true) {
+                $check = Utils::runwrap(
+                    "iptables -C INPUT -p udp --dport {$port} -m comment --comment " . escapeshellarg($comment) . " -j ACCEPT 2>&1",
+                    false,
+                    false
+                );
+
+                if ( ! empty($check)) {
+                    break;
+                }
+
+                Utils::runwrap(
+                    "iptables -D INPUT -p udp --dport {$port} -m comment --comment " . escapeshellarg($comment) . " -j ACCEPT"
+                );
+                $removed = true;
+            }
+
+            if ($removed) {
+                Utils::logwrap("Removed firewall rule for UDP port {$port}");
+            }
         }
     }
 
@@ -203,7 +258,7 @@ class System extends \EDACerton\PluginUtils\System
             $exclude_interfaces = "";
             $write_file         = true;
             $network_extra_file = '/boot/config/network-extra.cfg';
-            $ifname             = 'netbird1';
+            $ifname             = $config->InterfaceName;
 
             if (file_exists($network_extra_file)) {
                 $netExtra = parse_ini_file($network_extra_file);
@@ -274,7 +329,18 @@ class System extends \EDACerton\PluginUtils\System
             $json['WgPort'] = $config->WgPort;
         }
 
-        $json['WgIface'] = 'netbird1';
+        $wgIface         = $config->InterfaceName;
+        $json['WgIface'] = $wgIface;
+
+        // Ensure the WireGuard interface is blacklisted from ICE candidate gathering.
+        // Without this, the ICE agent tries to send STUN from the netbird WireGuard
+        // interface itself, which hangs gathering and prevents P2P with remote peers.
+        if ( ! isset($json['IFaceBlackList']) || ! is_array($json['IFaceBlackList'])) {
+            $json['IFaceBlackList'] = [];
+        }
+        if ( ! in_array($wgIface, $json['IFaceBlackList'], true)) {
+            $json['IFaceBlackList'][] = $wgIface;
+        }
 
         $newContent = json_encode($json, JSON_PRETTY_PRINT);
         if ($newContent === false) {
