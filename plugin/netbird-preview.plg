@@ -4,7 +4,7 @@
 <PLUGIN 
   name="netbird"
   author="Alvaro Estrada"
-  version="2026.04.03.0711"
+  version="2026.04.06.0745"
   launch="Settings/Netbird"
   pluginURL="https://raw.githubusercontent.com/AlvaroEstradaDev/unraid-netbird/preview/plugin/netbird-preview.plg"
   support="https://forums.unraid.net/topic/"
@@ -16,6 +16,10 @@
 <CHANGES>
 <![CDATA[
 
+### 2026.04.06.0745
+
+Automated update of Netbird to version 0.67.4.
+
 ### 2026.04.03.0711
 
 Automated update of Netbird to version 0.67.3.
@@ -23,12 +27,6 @@ Automated update of Netbird to version 0.67.3.
 ### 2026.04.02.0714
 
 Automated update of Netbird to version 0.67.2.
-
-### 2026.03.29.1447
-
-### 🐛 Bug Fixes
-
-- fix: add iptables firewall rule for wireguard port and fix p2p ice gathering ([#31](https://github.com/AlvaroEstradaDev/unraid-netbird/pull/31))
 
 
 For older releases, see https://github.com/AlvaroEstradaDev/unraid-netbird/releases
@@ -67,14 +65,14 @@ if ($oldPlugin !== "") {
 </INLINE>
 </FILE>
 
-<FILE Name="/boot/config/plugins/netbird/0.67.3.tar.gz">
-<URL>https://github.com/netbirdio/netbird/releases/download/v0.67.3/netbird_0.67.3_linux_amd64.tar.gz</URL>
-<SHA256>e958418923b5dab4c745c6c72b619f2a2b1bd37e12802102ca1e0c63d5846c43</SHA256>
+<FILE Name="/boot/config/plugins/netbird/0.67.4.tar.gz">
+<URL>https://github.com/netbirdio/netbird/releases/download/v0.67.4/netbird_0.67.4_linux_amd64.tar.gz</URL>
+<SHA256>3bcde152912039e869a95cdedb52a43790f10c80958051be0ff69bda7d78bc11</SHA256>
 </FILE>
 
-<FILE Name="/boot/config/plugins/netbird/unraid-netbird-utils-2026.04.03.0711-noarch-1.txz">
-<URL>https://github.com/AlvaroEstradaDev/unraid-netbird/releases/download/2026.04.03.0711/unraid-netbird-utils-2026.04.03.0711-noarch-1.txz</URL>
-<SHA256>8bb29ef08679365bcd2d7870043d5f5c0544df528a9182e0f5f4811c80e4c80a</SHA256>
+<FILE Name="/boot/config/plugins/netbird/unraid-netbird-utils-2026.04.06.0745-noarch-1.txz">
+<URL>https://github.com/AlvaroEstradaDev/unraid-netbird/releases/download/2026.04.06.0745/unraid-netbird-utils-2026.04.06.0745-noarch-1.txz</URL>
+<SHA256>4325a9ac822e06345ad471908dd0e727af2f6515575ec6baf5df565695673495</SHA256>
 </FILE>
 
 <!--
@@ -92,10 +90,10 @@ if [ -L "/etc/rc.d/rc.netbird" ]; then
     rm -f /etc/rc.d/rc.netbird
 fi
 
-upgradepkg --install-new /boot/config/plugins/netbird/unraid-netbird-utils-2026.04.03.0711-noarch-1.txz
+upgradepkg --install-new /boot/config/plugins/netbird/unraid-netbird-utils-2026.04.06.0745-noarch-1.txz
 
 mkdir -p /usr/local/emhttp/plugins/netbird/bin
-tar xzf /boot/config/plugins/netbird/0.67.3.tar.gz -C /usr/local/emhttp/plugins/netbird/bin netbird
+tar xzf /boot/config/plugins/netbird/0.67.4.tar.gz -C /usr/local/emhttp/plugins/netbird/bin netbird
 
 echo "state" > /boot/config/plugins/netbird/.gitignore
 
@@ -119,8 +117,8 @@ sed -i "s/Netbird\*\*/Netbird (Preview)**/" /usr/local/emhttp/plugins/netbird/RE
 netbird completion bash > /etc/bash_completion.d/netbird
 
 # cleanup old versions
-rm -f $(ls /boot/config/plugins/netbird/unraid-netbird-utils-*.txz 2>/dev/null | grep -v '2026.04.03.0711')
-rm -f $(ls /boot/config/plugins/netbird/*.tar.gz 2>/dev/null | grep -v '0.67.3')
+rm -f $(ls /boot/config/plugins/netbird/unraid-netbird-utils-*.txz 2>/dev/null | grep -v '2026.04.06.0745')
+rm -f $(ls /boot/config/plugins/netbird/*.tar.gz 2>/dev/null | grep -v '0.67.4')
 
 # check to see if the state file has been backed up to Unraid Connect
 if [ -d "/boot/.git" ]; then
@@ -143,7 +141,7 @@ fi
 echo ""
 echo "----------------------------------------------------"
 echo " netbird has been installed."
-echo " Version: 2026.04.03.0711"
+echo " Version: 2026.04.06.0745"
 echo "----------------------------------------------------"
 echo ""
 ]]>
