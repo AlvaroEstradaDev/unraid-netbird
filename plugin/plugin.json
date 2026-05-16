@@ -5,6 +5,6 @@
   "min": "7.0.0",
   "support": "https://forums.unraid.net/topic/",
   "launch": "Settings/Netbird",
-  "netbirdVersion": "0.71.0",
-  "netbirdSHA256": "76be9d368aac0dc9d9573b79feeaa5e62e777dd55fd3a8febb88ba2052923621"
+  "netbirdVersion": "0.71.1",
+  "netbirdSHA256": "8b1e02db89f52d5ad138466a358eecf1d0429e4265abfd0a5f0c2d1072c0f60c"
 }
