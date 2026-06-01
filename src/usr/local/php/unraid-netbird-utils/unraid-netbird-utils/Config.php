@@ -30,6 +30,7 @@ class Config
     public bool $AllowFunnel;
     public bool $AddPeersToHosts;
     public bool $UseTPM;
+    public bool $DisableFirewall;
     public int $WgPort;
     public string $ManagementUrl;
     public string $SetupKey;
@@ -55,6 +56,7 @@ class Config
         $this->AllowFunnel      = boolval($saved_config["ALLOW_FUNNEL"] ?? "0");
         $this->AddPeersToHosts  = boolval($saved_config["ADD_PEERS_TO_HOSTS"] ?? "0");
         $this->UseTPM           = boolval($saved_config["USE_TPM"] ?? "0");
+        $this->DisableFirewall  = boolval($saved_config["DISABLE_FIREWALL"] ?? "0");
 
         $this->WgPort = intval($saved_config["WG_PORT"] ?? "51820");
 

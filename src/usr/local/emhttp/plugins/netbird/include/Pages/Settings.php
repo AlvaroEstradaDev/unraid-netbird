@@ -123,6 +123,20 @@ if ($netbirdConfig->Enable) {
         <blockquote class='inline_help'><?= $tr->tr("settings.context.ip_forward"); ?></blockquote>
 
         <dl>
+            <dt>Disable Firewall</dt>
+            <dd>
+                <select name='DISABLE_FIREWALL' size='1' class='narrow'>
+                    <?= Utils::make_option( ! $netbirdConfig->DisableFirewall, '0', $tr->tr("no")); ?>
+                    <?= Utils::make_option($netbirdConfig->DisableFirewall, '1', $tr->tr("yes")); ?>
+                </select>
+            </dd>
+        </dl>
+        <blockquote class='inline_help'>
+            Disable NetBird's built-in firewall management. This prevents NetBird from modifying iptables rules,
+            which can resolve conflicts with Docker container networking. Requires restart to take effect.
+        </blockquote>
+
+        <dl>
             <dt><?= $tr->tr("settings.tpm"); ?></dt>
             <dd>
                 <select name='USE_TPM' id='USE_TPM' onchange='showSettingWarning("tpm","#USE_TPM");' size='1'

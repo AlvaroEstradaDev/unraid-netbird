@@ -358,6 +358,7 @@ class System extends \EDACerton\PluginUtils\System
 
     public static function createNetbirdParamsFile(Config $config): void
     {
-        file_put_contents('/usr/local/emhttp/plugins/netbird/custom-params.sh', 'NETBIRD_CUSTOM_PARAMS=""');
+        $params = $config->DisableFirewall ? '--disable-firewall' : '';
+        file_put_contents('/usr/local/emhttp/plugins/netbird/custom-params.sh', "NETBIRD_CUSTOM_PARAMS=\"{$params}\"");
     }
 }
