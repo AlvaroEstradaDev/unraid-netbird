@@ -30,6 +30,7 @@ $utils = new Utils(PLUGIN_NAME);
 
 $netbirdConfig = $netbirdConfig ?? new Config();
 
+$utils->run_task('Netbird\System::createLogDirectory');
 $utils->run_task('Netbird\System::createNetbirdParamsFile', array($netbirdConfig));
 $utils->run_task('Netbird\System::updateNetbirdConfig', array($netbirdConfig));
 $utils->run_task('Netbird\System::applyGRO');

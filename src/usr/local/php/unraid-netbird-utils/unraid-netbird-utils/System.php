@@ -356,6 +356,15 @@ class System extends \EDACerton\PluginUtils\System
         Utils::logwrap("Updated netbird config.json: DisableDNS={$disableDNS}, DisableClientRoutes={$disableClientRoutes}, ServerSSHAllowed={$serverSSHAllowed}");
     }
 
+    public static function createLogDirectory(): void
+    {
+        $logDir = '/var/log/netbird';
+        if ( ! is_dir($logDir)) {
+            mkdir($logDir, 0755, true);
+            Utils::logwrap("Created log directory {$logDir}");
+        }
+    }
+
     public static function createNetbirdParamsFile(Config $config): void
     {
         $params = $config->DisableFirewall ? '--disable-firewall' : '';
